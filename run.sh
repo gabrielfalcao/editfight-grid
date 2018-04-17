@@ -1,6 +1,6 @@
 #!/bin/bash
 set -ex
 
-sudo nginx
+nginx
 nodemon -i 'data*' -i time-lapse -i '.git*'
-sudo nginx -s quit
+nginx -s quit
