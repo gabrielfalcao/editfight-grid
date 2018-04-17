@@ -1,0 +1,9 @@
+{
+  "name": "editfight-once",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "uuid": "^3.1.0",
+    "uws": "^8.14.1"
+  }
+}

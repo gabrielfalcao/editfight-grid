@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>EditFight.com</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1.0; width=device-width">
+  <style>
+    html {
+      font-family: sans-serif;
+    }
+
+    *,
+    *:before,
+    *:after {
+      box-sizing: border-box;
+      font-family: inherit;
+      margin: 0;
+      padding: 0;
+    }
+
+
+
+
+
+    #error {
+      position: fixed;
+      z-index: 100;
+      top: 35%;
+      left: 0;
+      right: 0;
+
+      padding: 1em;
+      background: crimson;
+      color: white;
+      text-align: center;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+
+
+
+    #page {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+
+      display: flex;
+      flex-direction: column;
+    }
+
+    #colorsHolder {
+      flex-shrink: 0;
+    }
+
+    #rest {
+      flex-grow: 1;
+
+      display: flex;
+      flex-direction: column;
+    }
+
+    #canvasHolder {
+      flex: 1 0 70%;
+    }
+
+    #commentsHolder {
+      flex: 1 1 auto;
+      min-width: 0;
+      border: 0 solid #aaa;
+      border-top-width: 1px;
+    }
+
+    @media (min-aspect-ratio: 3/4) {
+      #rest {
+        flex-direction: row;
+      }
+
+      #commentsHolder {
+        border-width: 0;
+        border-left-width: 1px;
+      }
+    }
+
+
+
+
+    #colorsHolder {
+      -webkit-overflow-scrolling: touch;
+      background: #ccc;
+      border-bottom: 1px solid #aaa;
+    }
+
+    #canvasHolder {
+      background: #9a9a9a;
+      background-image: linear-gradient(45deg, #b4b4b4 25%, transparent 25%), linear-gradient(-45deg, #b4b4b4 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #b4b4b4 75%), linear-gradient(-45deg, transparent 75%, #b4b4b4 75%);
+      background-size: 20px 20px;
+      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    }
+
+    #commentsHolder {
+      display: flex;
+      flex-direction: column;
+
+      background: #fff;
+      padding: 0.5em;
+    }
+
+    #countHolder {
+      font-size: 75%;
+      opacity: 0.5;
+      text-align: center;
+    }
+
+    #comments {
+      -webkit-overflow-scrolling: touch;
+      overflow: scroll;
+      list-style-type: none;
+    }
+
+    .comment {
+      margin: 0.5em 0;
+    }
+
+    #canvas {
+      max-width: 100%;
+      max-height: 100%;
+
+      position: relative;
+    }
+
+    .userEventCircle {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+
+    .userEventCircle.hiding {
+      opacity: 0;
+      transition: opacity 1s linear;
+    }
+
+    #textbox {
+      font-size: inherit;
+      padding: 0.5em;
+      width: 100%;
+    }
+
+    #colorsHolder {
+      display: flex;
+      overflow: auto;
+      padding: 0.25em;
+    }
+
+    .colorBox {
+      position: relative;
+      min-width: 2em;
+      min-height: 2em;
+      list-style-type: none;
+      margin: 0.25em;
+    }
+
+    .colorBox:not(.selected) {
+      border-radius: 50%;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="error" class="hidden">
+    There was once an error. One day, the error existed. The end.
+  </div>
+
+  <div id="page">
+
+    <ol id="colorsHolder">
+      Color chooser will go here soon.
+    </ol>
+
+    <div id="rest">
+
+      <div id="canvasHolder">
+        <canvas id="canvas" width="1000" height="1000"></canvas>
+      </div>
+
+      <div id="commentsHolder">
+        <form autocomplete="off" id="commentForm">
+          <input autofocus autocomplete="off" id="textbox" type="text" placeholder="Chat box">
+        </form>
+        <div id="countHolder">(There are
+          <span id="count">n</span> other people here.)</div>
+        <ol id="comments"></ol>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    "use strict";
+
+    // colors based on http://alumni.media.mit.edu/~wad/color/palette.html
+    const colors = [
+      "rgb(0, 0, 0)",
+      "rgb(87, 87, 87)",
+      "rgb(173, 35, 35)",
+      "rgb(42, 75, 215)",
+      "rgb(29, 105, 20)",
+      "rgb(129, 74, 25)",
+      "rgb(129, 38, 192)",
+      "rgb(160, 160, 160)",
+      "rgb(129, 197, 122)",
+      "rgb(157, 175, 255)",
+      "rgb(41, 208, 208)",
+      "rgb(255, 146, 51)",
+      "rgb(255, 238, 51)",
+      "rgb(233, 222, 187)",
+      "rgb(255, 205, 243)",
+      "rgb(255, 255, 255)",
+    ];
+
+    const colorNames = [
+      "Black",
+      "Dark Gray",
+      "Red",
+      "Blue",
+      "Green",
+      "Brown",
+      "Purple",
+      "Light Gray",
+      "Light Green",
+      "Light Blue",
+      "Cyan",
+      "Orange",
+      "Yellow",
+      "Tan",
+      "Pink",
+      "White",
+    ];
+
+    const countElement = document.getElementById('count');
+    const errorElement = document.getElementById('error');
+    const commentsElement = document.getElementById('comments');
+    const colorsHolder = document.getElementById('colorsHolder');
+    const commentForm = document.getElementById('commentForm');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    // canvas.addEventListener('DOMMouseScroll', scrollCanvas, false);
+    // canvas.addEventListener('mousewheel', scrollCanvas, false);
+    // canvas.addEventListener('mousedown', canvasMouseDown, false);
+    canvas.addEventListener('mousemove', canvasMouseMove, false);
+    // canvas.addEventListener('mouseup', canvasMouseUp, false);
+
+    let grid = [];
+    let scale = 1;
+    // let lastMouse = {};
+
+    function scrollCanvas(e) {
+      e.preventDefault();
+      scale += -e.wheelDelta / 500;
+      if (scale < 0.25) scale = 0.25;
+      if (scale > 10) scale = 10;
+      repaint();
+    }
+
+    function canvasMouseDown(e) {
+      lastMouse.x = e.offsetX;
+      lastMouse.y = e.offsetY;
+      // ctx.trans
+      console.log(lastMouse);
+    }
+
+    function canvasMouseMove(e) {
+      repaint(); // TODO: only redraw if x/y are different than last redraw
+
+      const rect = canvas.getBoundingClientRect();
+      const w = rect.width / 100;
+      const h = rect.height / 100;
+      const x = Math.floor(e.offsetX / w);
+      const y = Math.floor(e.offsetY / h);
+      console.log(x, y);
+
+      ctx.fillStyle = colors[currentColor];
+      ctx.fillRect(x * 10, y * 10, 10, 10);
+
+      ctx.strokeStyle = '#ccc';
+      ctx.lineWidth = '2px';
+      ctx.strokeRect(x * 10, y * 10, 10, 10);
+    }
+
+    function canvasMouseUp(e) {
+    }
+
+    function repaintOne(i, c, userColor) {
+      let x = i % 100;
+      let y = Math.floor(i / 100);
+      ctx.fillStyle = colors[c];
+      ctx.fillRect(x * 10, y * 10, 10, 10);
+
+      if (userColor) {
+        const rect = canvas.getBoundingClientRect();
+
+        const w = (rect.width / 100);
+        const h = (rect.height / 100);
+
+        const px = (x * w) + rect.left;
+        const py = (y * h) + rect.top;
+
+        const circle = document.createElement('div');
+        circle.className = 'userEventCircle';
+        circle.style.left = px - (w / 2) + 'px';
+        circle.style.top = py - (h / 2) + 'px';
+        circle.style.width = w * 2 + 'px';
+        circle.style.height = h * 2 + 'px';
+        circle.style.backgroundColor = userColor;
+        document.body.appendChild(circle);
+
+        setTimeout(() => {
+          circle.classList.add('hiding');
+          setTimeout(() => {
+            circle.remove();
+          }, 1000);
+        }, 100);
+      }
+    }
+
+    function repaint() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = '#bbb';
+
+      // ctx.scale(scale, scale);
+
+      for (let i = 0; i < grid.length; i++) {
+        const c = grid[i];
+        let x = i % 100;
+        let y = Math.floor(i / 100);
+        ctx.fillStyle = colors[c];
+        ctx.fillRect(x * 10, y * 10, 10, 10);
+        // ctx.strokeRect(x * 10, y * 10, 10, 10);
+      }
+
+      // ctx.scale(-scale, -scale);
+
+    }
+
+    function appendMessage(msg) {
+      console.log('appendingmsg', msg);
+      const commentEl = document.createElement('li');
+      commentEl.className = 'comment';
+      commentEl.innerText = msg.text;
+      commentEl.style.color = colorForHash(msg.hash);
+      commentsElement.insertAdjacentElement('afterbegin', commentEl);
+    }
+
+    const socket = connect(
+      `ws://${location.hostname}/app`,
+      {
+
+        count(n) {
+          countElement.innerText = n - 1;
+        },
+
+        canvas(canvas) {
+          // console.log('canvas', canvas)
+          grid = [];
+          for (let i = 0; i < canvas.length; i++) {
+            const hex = canvas.charAt(i);
+            const color = parseInt(hex, 16);
+            grid.push(color);
+          }
+          repaint();
+        },
+
+        pixel({ x, y, c, hash }) {
+          // console.log('update', x, y, c, hash);
+          const i = y * 100 + x;
+          grid[i] = c;
+          repaintOne(i, c, colorForHash(hash));
+        },
+
+        message(msg) {
+          appendMessage(msg);
+        },
+
+        messages(messages) {
+          commentsElement.innerHTML = '';
+          for (let i = 0; i < messages.length; i++) {
+            const msg = messages[i];
+            appendMessage(msg);
+          }
+        },
+
+      }
+    )
+
+    let currentColor = 0;
+    setupColorChooser(currentColor, color => {
+      currentColor = color;
+      // console.log('dude chose color:', color);
+    });
+
+    canvas.onclick = event => {
+      const rect = canvas.getBoundingClientRect();
+      const x = Math.floor((event.clientX - rect.left) / (canvas.clientWidth / 100) / scale);
+      const y = Math.floor((event.clientY - rect.top) / (canvas.clientHeight / 100) / scale);
+
+      const i = y * 100 + x;
+      repaintOne(i, currentColor);
+
+      socket.send({
+        paint: { x, y, c: currentColor }
+      });
+
+      // console.log(x, y, currentColor);
+    };
+
+    function setupColorChooser(currentColor, fn) {
+      colorsHolder.innerHTML = '';
+      let selectedBox = null;
+      for (let i = 0; i < 16; i++) {
+        const colorBox = document.createElement('li');
+        colorBox.className = 'colorBox';
+        colorBox.style.backgroundColor = colors[i];
+        colorBox.title = colorNames[i];
+        colorBox.onclick = () => {
+          if (selectedBox) {
+            selectedBox.classList.remove('selected');
+          }
+          colorBox.classList.add('selected');
+          selectedBox = colorBox;
+          fn(i);
+        };
+
+        if (currentColor === i) {
+          colorBox.onclick();
+        }
+
+        colorsHolder.appendChild(colorBox);
+      }
+    }
+
+    let myName = localStorage.getItem('myName');
+
+    commentForm.onsubmit = function(e) {
+      e.preventDefault();
+      let text = textbox.value;
+      if (myName) text = `[${myName}] ${text}`;
+      textbox.value = '';
+      socket.send({ text });
+
+      const maybeName = text.match(/\/name (\w+)/);
+      console.log(maybeName && maybeName[1]);
+      if (maybeName && maybeName[1]) {
+        myName = maybeName[1];
+        localStorage.setItem('myName', myName);
+      }
+    }
+
+    function connect(addr, handler) {
+      const connection = new WebSocket(addr);
+
+      connection.onclose = (e) => {
+        window.onbeforeunload = null;
+        showError("Disconnected; reloading.");
+        setTimeout(() => window.location.reload(true), 500);
+      }
+
+      connection.onmessage = (message) => {
+        const json = JSON.parse(message.data);
+        Object.entries(json).forEach(([key, value]) => {
+          handler[key](value);
+        });
+      }
+
+      return {
+        send(msg) {
+          connection.send(JSON.stringify(msg));
+        }
+      }
+    }
+
+    function colorForHash(hash) {
+      const hue = hash % 180 + 180;
+      const sat = Math.abs(hash) % 50 + 30;
+      const light = Math.abs(hash) % 60 + 20;
+      return `hsl(${hue}, ${sat}%, ${light}%)`;
+    }
+
+    function showError(text) {
+      errorElement.innerText = text;
+      errorElement.classList.remove('hidden');
+    }
+  </script>
+</body>
+
+</html>
