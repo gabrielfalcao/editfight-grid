@@ -7,7 +7,6 @@ const fs = require('fs');
 const config = {
   port: 4000,
   origin: process.env.NODE_ORIGIN,
-  backups: process.env.SHOULD_BACKUP,
   pruneInterval: 30,
   charLimit: 1000,
 };
@@ -209,17 +208,6 @@ class AppState {
     fs.writeFileSync(this.filename, this.payload);
   }
 
-  backup() {
-    const filename = `./data-backup-${Math.floor(new Date() / 1000)}.json`;
-    fs.writeFileSync(filename, this.payload);
-    console.log(`Backing up to "${this.filename}"`);
-  }
-
-  backupPeriodically() {
-    this.backup();
-    setInterval(this.backup.bind(this), 1000 * 60 * 60); // every hour
-  }
-
   clearGrid() {
     this.canvas = this.emptyColor.repeat(100 * 100);
     this.recachePayload();
@@ -293,6 +281,32 @@ class Throttler {
 
 
 
+class TimeLapse {
+
+  constructor(filename) {
+    this.buffer = Buffer.allocUnsafe(11);
+    this.file = fs.createWriteStream(filename, { flags: 'a' });
+  }
+
+  add(x, y, c) {
+    const t = new Date().getTime();
+
+    this.buffer.writeUInt8(x, 0);
+    this.buffer.writeUInt8(y, 1);
+    this.buffer.writeUInt8(c, 2);
+    this.buffer.writeDoubleLE(t, 3);
+
+    console.log('Update', x, y, c, t, this.buffer);
+
+    this.file.write(this.buffer);
+  }
+
+}
+
+
+
+
+
 
 
 
@@ -307,13 +321,11 @@ const server = new Server({
 const clearer = new Clearer(server);
 const appState = new AppState('./data');
 const throttler = new Throttler();
+const timeLapse = new TimeLapse('./time-lapse');
 
 appState.loadIfExists();
 appState.savePeriodically();
 
-if (config.backups) {
-  appState.backupPeriodically();
-}
 
 
 
@@ -347,6 +359,8 @@ server.commands = {
     ) {
       return;
     }
+
+    timeLapse.add(x, y, c);
 
     appState.updatePixel(x, y, c);
     server.sendToAll({ pixel: update });

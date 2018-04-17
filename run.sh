@@ -2,5 +2,5 @@
 set -ex
 
 sudo nginx
-nodemon -i 'data*' -i '.git*'
+nodemon -i 'data*' -i time-lapse -i '.git*'
 sudo nginx -s quit
