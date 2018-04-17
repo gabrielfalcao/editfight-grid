@@ -207,12 +207,16 @@
       font-weight: bold;
       color: crimson;
     }
+
+    #welcome.hidden {
+      display: none;
+    }
   </style>
 </head>
 
 <body>
 
-  <form id="welcome">
+  <form id="welcome" class="hidden">
     <div id="welcomeContent">
       <h1>Welcome to EditFight.com!</h1>
       <p>This week it's an MMO pixel painting game. Basically everyone sees the same 100 x 100 grid and we can all edit it simultaneously.</p>
@@ -223,7 +227,13 @@
         a poop joke, and I'm sure you're more creative than that.</p>
       <p>If you're a programmer, feel free to check out
         <a href="https://github.com/sdegutis/editfight-grid" target="_blank" rel="noopener noreferrer">the source code</a> too!</p>
-      <button onclick="dismissWelcome(event)">Check it out!</button>
+      <p>
+        <button onclick="dismissWelcome(); return false">Check it out!</button>
+      </p>
+      <p>
+        <label>
+          <input id="doNotShowWelcomeAgainV1" type="checkbox"> Do not show again</label>
+      </p>
     </div>
   </form>
 
@@ -303,6 +313,7 @@
     const commentsElement = document.getElementById('comments');
     const colorsHolder = document.getElementById('colorsHolder');
     const commentForm = document.getElementById('commentForm');
+    const welcomeForm = document.getElementById('welcome');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
 
@@ -316,12 +327,14 @@
     let scale = 1;
     // let lastMouse = {};
 
-    function dismissWelcome(e) {
-      e.preventDefault();
+    if (!localStorage.getItem('doNotShowWelcomeAgainV1')) {
+      welcomeForm.classList.remove('hidden');
+    }
 
-      document.getElementById('welcome').remove();
-
-      console.log('hey');
+    function dismissWelcome() {
+      const skip = document.getElementById('doNotShowWelcomeAgainV1').checked;
+      localStorage.setItem('doNotShowWelcomeAgainV1', skip ? 'yes' : '');
+      welcomeForm.classList.add('hidden');
     }
 
     function scrollCanvas(e) {
