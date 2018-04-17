@@ -4,7 +4,7 @@
 <head>
   <title>EditFight.com</title>
   <meta charset="utf-8">
-  <meta name="viewport" content="initial-scale=1.0; width=device-width">
+  <meta name="viewport" content="initial-scale=1.0, width=device-width">
   <style>
     html {
       font-family: sans-serif;
@@ -169,10 +169,60 @@
     .colorBox:not(.selected) {
       border-radius: 50%;
     }
+
+    #welcome {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 2000;
+      background: #e6e4d9;
+      padding: 0 1em;
+    }
+
+    #welcomeContent {
+      margin: 0 auto;
+      width: 95%;
+      max-width: 30rem;
+    }
+
+    #welcome h1,
+    #welcome p {
+      margin: 1rem 0;
+    }
+
+    #welcome button {
+      background: #19a22d;
+      border: 0;
+      border-bottom: 3px solid #0e731d;
+      padding: 0.5em 1em;
+      font-size: inherit;
+      border-radius: 3px;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    #welcome .emphasis {
+      font-weight: bold;
+      color: crimson;
+    }
   </style>
 </head>
 
 <body>
+
+  <form id="welcome">
+    <div id="welcomeContent">
+      <h1>Welcome to EditFight.com!</h1>
+      <p>This week it's an MMO pixel painting game. Basically everyone sees the same 100 x 100 grid and we can all edit it simultaneously.</p>
+      <p>I've added a time-lapse feature so it's recording every change to the grid! I plan to make a script that turns each
+        24 hour period into a gif/video and posts it to imgur/youtube, linking them back here!</p>
+      <p>Please be respectful and keep it
+        <span class="emphasis">family friendly</span>, I'd like to show my kids the time-lapses.</p>
+      <button onclick="dismissWelcome(event)">Check it out!</button>
+    </div>
+  </form>
 
   <div id="error" class="hidden">
     There was once an error. One day, the error existed. The end.
@@ -262,6 +312,14 @@
     let grid = [];
     let scale = 1;
     // let lastMouse = {};
+
+    function dismissWelcome(e) {
+      e.preventDefault();
+
+      document.getElementById('welcome').remove();
+
+      console.log('hey');
+    }
 
     function scrollCanvas(e) {
       e.preventDefault();
