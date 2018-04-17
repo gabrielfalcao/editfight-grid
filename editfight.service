@@ -4,7 +4,7 @@ Description=EditFight
 [Service]
 User=ubuntu
 Group=ubuntu
-Environment=NODE_ORIGIN=http://editfight.com SHOULD_BACKUP=true
+Environment=NODE_ORIGIN=http://editfight.com
 WorkingDirectory=/home/ubuntu/app
 ExecStart=/usr/bin/node index.js
 Restart=always
