@@ -208,12 +208,6 @@ class AppState {
     fs.writeFileSync(this.filename, this.payload);
   }
 
-  clearGrid() {
-    this.canvas = this.emptyColor.repeat(100 * 100);
-    this.recachePayload();
-    return this.canvas;
-  }
-
   updatePixel(x, y, c) {
     this.dirty = true;
     const i = y * 100 + x;
@@ -227,36 +221,6 @@ class AppState {
 
 
 
-
-
-class Clearer {
-
-  constructor(server) {
-    this.ips = {};
-    this.server = server;
-  }
-
-  validClearCommand(text) {
-    return text.toLowerCase().match(/^(\[\w+\] )?clear$/);
-  }
-
-  canClear() {
-    return Object.keys(this.ips).length >= this.server.count * 0.50;
-  }
-
-  voteAndMaybeClear(text, ip) {
-    if (!this.validClearCommand(text))
-      return false;
-
-    this.ips[ip] = true;
-
-    const clearing = this.canClear();
-    if (clearing) this.ips = {};
-
-    return clearing;
-  }
-
-}
 
 
 class Throttler {
@@ -318,7 +282,6 @@ const server = new Server({
   pruneInterval: config.pruneInterval,
 });
 
-const clearer = new Clearer(server);
 const appState = new AppState('./data');
 const throttler = new Throttler();
 const timeLapse = new TimeLapse('./time-lapse');
@@ -373,13 +336,7 @@ server.commands = {
     if (text.length > config.charLimit) return;
 
     const message = appState.pushMessage(text, ws.hash);
-    const payload = { message }
-
-    if (clearer.voteAndMaybeClear(text, ws.ip)) {
-      payload.canvas = appState.clearGrid();
-    }
-
-    server.sendToAll(payload);
+    server.sendToAll({ message });
   },
 
 };
