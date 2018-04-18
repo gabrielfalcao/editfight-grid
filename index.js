@@ -211,7 +211,7 @@ class AppState {
   updatePixel(x, y, c) {
     this.dirty = true;
     const i = y * 100 + x;
-    this.canvas = replaceAt(this.canvas, i, c.toString(32));
+    this.canvas = replaceAt(this.canvas, i, c.toString(16));
     this.recachePayload();
   }
 
@@ -318,7 +318,7 @@ server.commands = {
       typeof (c) !== 'number' ||
       x < 0 || x > 99 ||
       y < 0 || y > 99 ||
-      c < 0 || c > 31
+      c < 0 || c > 15
     ) {
       return;
     }

@@ -262,75 +262,43 @@
   <script>
     "use strict";
 
-    // colors based on https://github.com/geoffb/dawnbringer-palettes
+    // colors based on http://alumni.media.mit.edu/~wad/color/palette.html
     const colors = [
-      "#000000",
-      "#222034",
-      "#45283C",
-      "#663931",
-      "#8F563B",
-      "#DF7126",
-      "#D9A066",
-      "#EEC39A",
-      "#FBF236",
-      "#99E550",
-      "#6ABE30",
-      "#37946E",
-      "#4B692F",
-      "#524B24",
-      "#323C39",
-      "#3F3F74",
-      "#306082",
-      "#5B6EE1",
-      "#639BFF",
-      "#5FCDE4",
-      "#CBDBFC",
-      "#FFFFFF",
-      "#9BADB7",
-      "#847E87",
-      "#696A6A",
-      "#595652",
-      "#76428A",
-      "#AC3232",
-      "#D95763",
-      "#D77BBA",
-      "#8F974A",
-      "#8A6F30",
+      "rgb(0, 0, 0)",
+      "rgb(87, 87, 87)",
+      "rgb(173, 35, 35)",
+      "rgb(42, 75, 215)",
+      "rgb(29, 105, 20)",
+      "rgb(129, 74, 25)",
+      "rgb(129, 38, 192)",
+      "rgb(160, 160, 160)",
+      "rgb(129, 197, 122)",
+      "rgb(157, 175, 255)",
+      "rgb(41, 208, 208)",
+      "rgb(255, 146, 51)",
+      "rgb(255, 238, 51)",
+      "rgb(233, 222, 187)",
+      "rgb(255, 205, 243)",
+      "rgb(255, 255, 255)",
     ];
 
     const colorNames = [
       "Black",
-      "Valhalla",
-      "Loulou",
-      "Oiled Cedar",
-      "Rope",
-      "Tahiti Gold",
-      "Twine",
-      "Pancho",
-      "Golden Fizz",
-      "Atlantis",
-      "Christi",
-      "Elf Green",
-      "Dell",
-      "Verdigris",
-      "Opal",
-      "Deep Koamaru",
-      "Venice Blue",
-      "Royal Blue",
-      "Cornflower",
-      "Viking",
-      "Light Steel Blue",
-      "White",
-      "Heather",
-      "Topaz",
-      "Dim Gray",
-      "Smokey Ash",
-      "Clairvoyant",
+      "Dark Gray",
+      "Red",
+      "Blue",
+      "Green",
       "Brown",
-      "Mandy",
-      "Plum",
-      "Rainforest",
-      "Stinger",
+      "Purple",
+      "Light Gray",
+      "Light Green",
+      "Light Blue",
+      "Cyan",
+      "Orange",
+      "Yellow",
+      "Tan",
+      "Pink",
+      "White",
     ];
 
     const countElement = document.getElementById('count');
@@ -472,7 +440,7 @@
           grid = [];
           for (let i = 0; i < canvas.length; i++) {
             const hex = canvas.charAt(i);
-            const color = parseInt(hex, 32);
+            const color = parseInt(hex, 16);
             grid.push(color);
           }
           repaint();
@@ -524,7 +492,7 @@
     function setupColorChooser(currentColor, fn) {
       colorsHolder.innerHTML = '';
       let selectedBox = null;
-      for (let i = 0; i < 32; i++) {
+      for (let i = 0; i < 16; i++) {
         const colorBox = document.createElement('li');
         colorBox.className = 'colorBox';
         colorBox.style.backgroundColor = colors[i];
