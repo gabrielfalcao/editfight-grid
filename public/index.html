@@ -232,8 +232,12 @@
       </p>
       <p>
         <label>
-          <input id="doNotShowWelcomeAgainV1" type="checkbox"> Do not show again</label>
+          <input id="doNotShowWelcomeAgainV2" type="checkbox"> Do not show again</label>
       </p>
+      <hr>
+      <p>
+        <b>Update:</b> The
+        <a href="https://imgur.com/gallery/3C5n7" target="_blank" rel="noopener">first time-lapse gif</a> is done!</p>
     </div>
   </form>
 
@@ -327,13 +331,13 @@
     let scale = 1;
     // let lastMouse = {};
 
-    if (!localStorage.getItem('doNotShowWelcomeAgainV1')) {
+    if (!localStorage.getItem('doNotShowWelcomeAgainV2')) {
       welcomeForm.classList.remove('hidden');
     }
 
     function dismissWelcome() {
-      const skip = document.getElementById('doNotShowWelcomeAgainV1').checked;
-      localStorage.setItem('doNotShowWelcomeAgainV1', skip ? 'yes' : '');
+      const skip = document.getElementById('doNotShowWelcomeAgainV2').checked;
+      localStorage.setItem('doNotShowWelcomeAgainV2', skip ? 'yes' : '');
       welcomeForm.classList.add('hidden');
     }
 
