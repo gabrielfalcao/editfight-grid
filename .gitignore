@@ -3,6 +3,7 @@ data/
 /data
 /backups
 /time-lapse
-
 /access.log.1
 /tmp.html
+/make-gif
+/output.gif
