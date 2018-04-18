@@ -551,11 +551,11 @@
     commentForm.onsubmit = function(e) {
       e.preventDefault();
       let text = textbox.value;
+      const maybeName = text.match(/^\/name (\w+)$/);
       if (myName) text = `[${myName}] ${text}`;
       textbox.value = '';
       socket.send({ text });
 
-      const maybeName = text.match(/\/name (\w+)/);
       console.log(maybeName && maybeName[1]);
       if (maybeName && maybeName[1]) {
         myName = maybeName[1];
