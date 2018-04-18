@@ -6,4 +6,4 @@ data/
 /access.log.1
 /tmp.html
 /make-gif
-/output.gif
+/*.gif

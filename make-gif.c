@@ -13,29 +13,51 @@ typedef struct __attribute__((__packed__)) Update {
 
 static uint8_t palette[] = {
   0, 0, 0,
-  87, 87, 87,
-  173, 35, 35,
-  42, 75, 215,
-  29, 105, 20,
-  129, 74, 25,
-  129, 38, 192,
-  160, 160, 160,
-  129, 197, 122,
-  157, 175, 255,
-  41, 208, 208,
-  255, 146, 51,
-  255, 238, 51,
-  233, 222, 187,
-  255, 205, 243,
+  34, 32, 52,
+  69, 40, 60,
+  102, 57, 49,
+  143, 86, 59,
+  223, 113, 38,
+  217, 160, 102,
+  238, 195, 154,
+  251, 242, 54,
+  153, 229, 80,
+  106, 190, 48,
+  55, 148, 110,
+  75, 105, 47,
+  82, 75, 36,
+  50, 60, 57,
+  63, 63, 116,
+  48, 96, 130,
+  91, 110, 225,
+  99, 155, 255,
+  95, 205, 228,
+  203, 219, 252,
   255, 255, 255,
+  155, 173, 183,
+  132, 126, 135,
+  105, 106, 106,
+  89, 86, 82,
+  118, 66, 138,
+  172, 50, 50,
+  217, 87, 99,
+  215, 123, 186,
+  143, 151, 74,
+  138, 111, 48,
 };
 
 
+
+
+
 int main(int argc, char **argv) {
-  if (argc < 3) {
-    fprintf(stderr, "Usage: ./make-gif <time-lapse-file> <output-gif-file>\n");
+  if (argc < 4) {
+    fprintf(stderr, "Usage: ./make-gif <time-lapse-file> <output-gif-file> <period in seconds, eg 30>\n");
     return 1;
   }
+
+  int period = atoi(argv[3]);
+  printf("Using period %d\n", period);
 
   FILE *file = fopen(argv[1], "r");
 
@@ -46,17 +68,19 @@ int main(int argc, char **argv) {
   struct Update *updates = malloc(sizeof(Update) * count);
 
   fread(updates, sizeof(Update), count, file);
+  fclose(file);
 
   ge_GIF *gif = ge_new_gif(
     argv[2],
     1000, 1000,
-    palette, 4,
+    palette, 5,
     0
   );
 
   uint8_t *blank = calloc(1000 * 1000, 1);
 
   double last = 0;
+  int changes = 0;
 
   for (int i = 0; i < count; i++) {
     memcpy(gif->frame, blank, 1000 * 1000);
@@ -64,7 +88,7 @@ int main(int argc, char **argv) {
     struct Update update = updates[i];
     double t = update.t;
 
-    for (int j = 0; j < i; j++) {
+    for (int j = 0; j <= i; j++) {
       struct Update update = updates[j];
       uint8_t x = update.x;
       uint8_t y = update.y;
@@ -77,16 +101,17 @@ int main(int argc, char **argv) {
       }
     }
 
-    if (t - last > 1000 * 30) {
+    printf(".", i);
+    changes++;
+    if (i == count - 1 || t - last > 1000.0 * period) {
+      printf("\nAdding frame for period of %.0f seconds with %d changes\n", (t - last) / 1000.0, changes);
       ge_add_frame(gif, 1);
       last = t;
+      changes = 0;
     }
   }
 
   ge_add_frame(gif, 1000);
-
-  fclose(file);
-
   ge_close_gif(gif);
 
   return 0;
