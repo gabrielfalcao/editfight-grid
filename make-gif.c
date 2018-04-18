@@ -73,7 +73,9 @@ int main(int argc, char **argv) {
       }
     }
 
-    ge_add_frame(gif, i == count - 1 ? 1000 : 1);
+    if (i % 3 == 0) {
+      ge_add_frame(gif, i == count - 1 ? 1000 : 1);
+    }
   }
 
   fclose(file);
