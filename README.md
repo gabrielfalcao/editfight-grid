@@ -4,6 +4,10 @@
 
 Live demo: http://editfight.com/
 
+- Single-file front-end
+- Single-file back-end
+- 0 front-end dependencies
+
 ### Rationale
 
 Reddit's r/place was a really cool concept but I never got to play it. So I
