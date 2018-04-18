@@ -56,15 +56,19 @@ int main(int argc, char **argv) {
 
   uint8_t *blank = calloc(1000 * 1000, 1);
 
+  double last = 0;
+
   for (int i = 0; i < count; i++) {
     memcpy(gif->frame, blank, 1000 * 1000);
+
+    struct Update update = updates[i];
+    double t = update.t;
 
     for (int j = 0; j < i; j++) {
       struct Update update = updates[j];
       uint8_t x = update.x;
       uint8_t y = update.y;
       uint8_t c = update.c;
-      double t = update.t;
 
       for (int y2 = 0; y2 < 10; y2++) {
         for (int x2 = 0; x2 < 10; x2++) {
@@ -73,12 +77,12 @@ int main(int argc, char **argv) {
       }
     }
 
-    if (i % 3 == 0) {
+    if (t - last > 1000 * 30) {
       ge_add_frame(gif, 1);
+      last = t;
     }
   }
 
-  // this serves both as final delay and just in case count % 3 != 0
   ge_add_frame(gif, 1000);
 
   fclose(file);
