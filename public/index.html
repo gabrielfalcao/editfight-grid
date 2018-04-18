@@ -73,18 +73,11 @@
     #commentsHolder {
       flex: 1 1 auto;
       min-width: 0;
-      border: 0 solid #aaa;
-      border-top-width: 1px;
     }
 
     @media (min-aspect-ratio: 3/4) {
       #rest {
         flex-direction: row;
-      }
-
-      #commentsHolder {
-        border-width: 0;
-        border-left-width: 1px;
       }
     }
 
@@ -94,7 +87,6 @@
     #colorsHolder {
       -webkit-overflow-scrolling: touch;
       background: #ccc;
-      border-bottom: 1px solid #aaa;
     }
 
     #canvasHolder {
@@ -155,7 +147,7 @@
     #colorsHolder {
       display: flex;
       overflow: auto;
-      padding: 0.25em;
+      /* padding: 0.25em; */
     }
 
     .colorBox {
@@ -163,10 +155,10 @@
       min-width: 2em;
       min-height: 2em;
       list-style-type: none;
-      margin: 0.25em;
+      /* margin: 0.25em; */
     }
 
-    .colorBox:not(.selected) {
+    .colorBox.selected {
       border-radius: 50%;
     }
 
