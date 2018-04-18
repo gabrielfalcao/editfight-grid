@@ -49,15 +49,15 @@ int main(int argc, char **argv) {
 
   ge_GIF *gif = ge_new_gif(
     argv[2],
-    100, 100,
+    1000, 1000,
     palette, 4,
     0
   );
 
-  uint8_t *blank = calloc(100 * 100, 1);
+  uint8_t *blank = calloc(1000 * 1000, 1);
 
   for (int i = 0; i < count; i++) {
-    memcpy(gif->frame, blank, 100 * 100);
+    memcpy(gif->frame, blank, 1000 * 1000);
 
     for (int j = 0; j < i; j++) {
       struct Update update = updates[j];
@@ -65,10 +65,15 @@ int main(int argc, char **argv) {
       uint8_t y = update.y;
       uint8_t c = update.c;
       double t = update.t;
-      gif->frame[y * 100 + x] = c;
+
+      for (int y2 = 0; y2 < 10; y2++) {
+        for (int x2 = 0; x2 < 10; x2++) {
+          gif->frame[(y * 10 + y2) * 1000 + (x * 10 + x2)] = c;
+        }
+      }
     }
 
-    ge_add_frame(gif, 1);
+    ge_add_frame(gif, i == count - 1 ? 1000 : 1);
   }
 
   fclose(file);
