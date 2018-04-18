@@ -180,8 +180,7 @@
       max-width: 30rem;
     }
 
-    #welcome h1,
-    #welcome p {
+    #welcomeContent>* {
       margin: 1rem 0;
     }
 
@@ -211,15 +210,15 @@
 
   <form id="welcome" class="hidden">
     <div id="welcomeContent">
-      <h1>Welcome to EditFight.com!</h1>
-      <p>This week it's an MMO pixel painting game. Basically everyone sees the same 100 x 100 grid and we can all edit it simultaneously.</p>
-      <p>I've added a time-lapse feature so it's recording every change to the grid! I plan to make a script that turns each
-        24 hour period into a gif/video and posts it to imgur/youtube, linking them back here!</p>
-      <p>Please be respectful and keep it
-        <span class="emphasis">family friendly</span>, I'd like to show my kids the time-lapses, and drawing obscenities is the equivalent of telling
-        a poop joke, and I'm sure you're more creative than that.</p>
-      <p>If you're a programmer, feel free to check out
-        <a href="https://github.com/sdegutis/editfight-grid" target="_blank" rel="noopener noreferrer">the source code</a> too!</p>
+      <h2>Welcome to EditFight.com!</h2>
+      <h4>MMO Pixel Art</h4>
+      <p>Everyone sees and edits the same 100 x 100 grid simultaneously!</p>
+      <p>Check out the
+        <a href="https://imgur.com/gallery/3C5n7" target="_blank" rel="noopener">first</a> and
+        <a href="https://i.imgur.com/Wmw7yfW.gif" target="_blank" rel="noopener">second</a> the-lapse gifs.
+      </p>
+      <p>(Oh and it's
+        <a href="https://github.com/sdegutis/editfight-grid" target="_blank" rel="noopener noreferrer">open source</a> too!)</p>
       <p>
         <button onclick="dismissWelcome(); return false">Check it out!</button>
       </p>
@@ -227,10 +226,6 @@
         <label>
           <input id="doNotShowWelcomeAgainV2" type="checkbox"> Do not show again</label>
       </p>
-      <hr>
-      <p>
-        <b>Update:</b> The
-        <a href="https://imgur.com/gallery/3C5n7" target="_blank" rel="noopener">first time-lapse gif</a> is done!</p>
     </div>
   </form>
 
