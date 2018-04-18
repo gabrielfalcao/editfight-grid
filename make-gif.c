@@ -74,9 +74,12 @@ int main(int argc, char **argv) {
     }
 
     if (i % 3 == 0) {
-      ge_add_frame(gif, i == count - 1 ? 1000 : 1);
+      ge_add_frame(gif, 1);
     }
   }
+
+  // this serves both as final delay and just in case count % 3 != 0
+  ge_add_frame(gif, 1000);
 
   fclose(file);
 
