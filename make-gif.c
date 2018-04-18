@@ -102,6 +102,7 @@ int main(int argc, char **argv) {
     }
 
     printf(".", i);
+    fflush(stdout);
     changes++;
     if (i == count - 1 || t - last > 1000.0 * period) {
       printf("\nAdding frame for period of %.0f seconds with %d changes\n", (t - last) / 1000.0, changes);
