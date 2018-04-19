@@ -126,7 +126,7 @@
       max-height: 100%;
 
       position: relative;
-      cursor: none;
+      cursor: crosshair;
     }
 
     #textbox {
@@ -351,6 +351,12 @@
       let oldY = Math.floor(lastHoveredGridIndex / 100);
       paintSpot(oldX, oldY, grid[lastHoveredGridIndex]);
       paintSpot(x, y, currentColor);
+
+      // ctx.fillStyle = '#ccc';
+      // ctx.fillRect(x * 10, y * 10, 10, 10);
+
+      // ctx.fillStyle = colors[currentColor];
+      // ctx.fillRect(x * 10 + 1, y * 10 + 1, 10 - 2, 10 - 2);
 
       lastHoveredGridIndex = i;
     }
