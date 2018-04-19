@@ -458,6 +458,8 @@
     function sendMessage(e) {
       e.preventDefault();
       let text = textbox.value;
+      if (text.trim().length === 0) return;
+
       const maybeName = text.match(/^\/name (\w+)$/);
       if (myName) text = `[${myName}] ${text}`;
       textbox.value = '';
