@@ -236,7 +236,7 @@ class Throttler {
     this.ips[ip] = true;
     setTimeout(() => {
       delete this.ips[ip];
-    }, 20);
+    }, 100);
 
     return false;
   }
