@@ -210,27 +210,6 @@
 
 <body>
 
-  <form id="welcome" class="hidden">
-    <div id="welcomeContent">
-      <h2>Welcome to EditFight.com!</h2>
-      <h4>MMO Pixel Art</h4>
-      <p>Everyone sees and edits the same 100 x 100 grid simultaneously!</p>
-      <p>Check out the
-        <a href="https://imgur.com/gallery/3C5n7" target="_blank" rel="noopener">first</a> and
-        <a href="https://i.imgur.com/Wmw7yfW.gif" target="_blank" rel="noopener">second</a> the-lapse gifs.
-      </p>
-      <p>(Oh and it's
-        <a href="https://github.com/sdegutis/editfight-grid" target="_blank" rel="noopener noreferrer">open source</a> too!)</p>
-      <p>
-        <button onclick="dismissWelcome(); return false">Check it out!</button>
-      </p>
-      <p>
-        <label>
-          <input id="doNotShowWelcomeAgainV2" type="checkbox"> Do not show again</label>
-      </p>
-    </div>
-  </form>
-
   <div id="error" class="hidden">
     There was once an error. One day, the error existed. The end.
   </div>
@@ -320,16 +299,6 @@
     let grid = [];
     let scale = 1;
     // let lastMouse = {};
-
-    if (!localStorage.getItem('doNotShowWelcomeAgainV2')) {
-      welcomeForm.classList.remove('hidden');
-    }
-
-    function dismissWelcome() {
-      const skip = document.getElementById('doNotShowWelcomeAgainV2').checked;
-      localStorage.setItem('doNotShowWelcomeAgainV2', skip ? 'yes' : '');
-      welcomeForm.classList.add('hidden');
-    }
 
     function scrollCanvas(e) {
       e.preventDefault();
