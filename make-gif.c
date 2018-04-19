@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
       }
     }
 
-    printf(".", i);
+    printf(".");
     fflush(stdout);
     changes++;
     if (i == count - 1 || t - last > 1000.0 * period) {
