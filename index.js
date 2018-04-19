@@ -319,7 +319,10 @@ server.onclose = (ws) => {
 server.commands = {
 
   paint(ws, update) {
-    if (throttler.throttle(ws.ip)) return;
+    if (throttler.throttle(ws.ip)) {
+      ws.terminate();
+      return;
+    }
 
     const { x, y, c } = update;
     update.hash = ws.hash;
