@@ -253,6 +253,7 @@ class Throttler {
       const b = Math.abs(info.delays[1] - info.delays[2]);
 
       if (a < 10 && b < 10) {
+        console.log('KICKING', ip, a, b);
         delete this.ips[ip];
         return true;
       }
