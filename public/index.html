@@ -289,86 +289,18 @@
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
 
-    canvas.addEventListener('mousemove', canvasMouseMove, false);
-
+    let currentColor = parseInt(localStorage.getItem('currentColor') || '0');
+    let myName = localStorage.getItem('myName');
     let grid = [];
 
-    function canvasMouseMove(e) {
-      repaint(); // TODO: only redraw if x/y are different than last redraw
+    canvas.onmousemove = mouseMovedOverCanvas;
+    canvas.onclick = clickedCanvas;
+    commentForm.onsubmit = sendMessage;
 
-      const rect = canvas.getBoundingClientRect();
-      const w = rect.width / 100;
-      const h = rect.height / 100;
-      const x = Math.floor(e.offsetX / w);
-      const y = Math.floor(e.offsetY / h);
-      console.log(x, y);
-
-      ctx.fillStyle = colors[currentColor];
-      ctx.fillRect(x * 10, y * 10, 10, 10);
-
-      ctx.strokeStyle = '#ccc';
-      ctx.lineWidth = '2px';
-      ctx.strokeRect(x * 10, y * 10, 10, 10);
-    }
-
-    function canvasMouseUp(e) {
-    }
-
-    function repaintOne(i, c, userColor) {
-      let x = i % 100;
-      let y = Math.floor(i / 100);
-      ctx.fillStyle = colors[c];
-      ctx.fillRect(x * 10, y * 10, 10, 10);
-
-      if (userColor) {
-        const rect = canvas.getBoundingClientRect();
-
-        const w = (rect.width / 100);
-        const h = (rect.height / 100);
-
-        const px = (x * w) + rect.left;
-        const py = (y * h) + rect.top;
-
-        const circle = document.createElement('div');
-        circle.className = 'userEventCircle';
-        circle.style.left = px - (w / 2) + 'px';
-        circle.style.top = py - (h / 2) + 'px';
-        circle.style.width = w * 2 + 'px';
-        circle.style.height = h * 2 + 'px';
-        circle.style.backgroundColor = userColor;
-        document.body.appendChild(circle);
-
-        setTimeout(() => {
-          circle.classList.add('hiding');
-          setTimeout(() => {
-            circle.remove();
-          }, 1000);
-        }, 100);
-      }
-    }
-
-    function repaint() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.strokeStyle = '#bbb';
-
-      for (let i = 0; i < grid.length; i++) {
-        const c = grid[i];
-        let x = i % 100;
-        let y = Math.floor(i / 100);
-        ctx.fillStyle = colors[c];
-        ctx.fillRect(x * 10, y * 10, 10, 10);
-        // ctx.strokeRect(x * 10, y * 10, 10, 10);
-      }
-    }
-
-    function appendMessage(msg) {
-      console.log('appendingmsg', msg);
-      const commentEl = document.createElement('li');
-      commentEl.className = 'comment';
-      commentEl.innerText = msg.text;
-      commentEl.style.color = colorForHash(msg.hash);
-      commentsElement.insertAdjacentElement('afterbegin', commentEl);
-    }
+    setupColorChooser(currentColor, color => {
+      currentColor = color;
+      localStorage.setItem('currentColor', color);
+    });
 
     const socket = connect(
       `ws://${location.host}/app`,
@@ -379,21 +311,27 @@
         },
 
         canvas(canvas) {
-          // console.log('canvas', canvas)
-          grid = [];
           for (let i = 0; i < canvas.length; i++) {
             const hex = canvas.charAt(i);
-            const color = parseInt(hex, 16);
-            grid.push(color);
+            const c = parseInt(hex, 16);
+
+            grid[i] = c;
+
+            let x = i % 100;
+            let y = Math.floor(i / 100);
+
+            ctx.fillStyle = colors[c];
+            ctx.fillRect(x * 10, y * 10, 10, 10);
           }
-          repaint();
         },
 
         pixel({ x, y, c, hash }) {
-          // console.log('update', x, y, c, hash);
           const i = y * 100 + x;
+
           grid[i] = c;
-          repaintOne(i, c, colorForHash(hash));
+
+          paintSpot(x, y, c);
+          showUserCircle(x, y, colorForHash(hash));
         },
 
         message(msg) {
@@ -411,26 +349,111 @@
       }
     )
 
-    let currentColor = 0;
-    setupColorChooser(currentColor, color => {
-      currentColor = color;
-      // console.log('dude chose color:', color);
-    });
-
-    canvas.onclick = event => {
-      const rect = canvas.getBoundingClientRect();
-      const x = Math.floor((event.clientX - rect.left) / (canvas.clientWidth / 100));
-      const y = Math.floor((event.clientY - rect.top) / (canvas.clientHeight / 100));
-
+    let lastHoveredGridIndex = 0;
+    function mouseMovedOverCanvas(e) {
+      const { x, y } = coordinatesFor(event);
       const i = y * 100 + x;
-      repaintOne(i, currentColor);
 
+      if (lastHoveredGridIndex == i)
+        return;
+
+      let oldX = lastHoveredGridIndex % 100;
+      let oldY = Math.floor(lastHoveredGridIndex / 100);
+      paintSpot(oldX, oldY, grid[lastHoveredGridIndex]);
+      paintSpot(x, y, currentColor);
+
+      lastHoveredGridIndex = i;
+    }
+
+    function paintSpot(x, y, c) {
+      ctx.fillStyle = colors[c];
+      ctx.fillRect(x * 10, y * 10, 10, 10);
+    }
+
+    // function repaintOne(i, c, userColor) {
+    //   let x = i % 100;
+    //   let y = Math.floor(i / 100);
+    //   ctx.fillStyle = colors[c];
+    //   ctx.fillRect(x * 10, y * 10, 10, 10);
+
+    //   if (userColor) {
+    //     const rect = canvas.getBoundingClientRect();
+
+    //     const w = (rect.width / 100);
+    //     const h = (rect.height / 100);
+
+    //     const px = (x * w) + rect.left;
+    //     const py = (y * h) + rect.top;
+
+    //     const circle = document.createElement('div');
+    //     circle.className = 'userEventCircle';
+    //     circle.style.left = px - (w / 2) + 'px';
+    //     circle.style.top = py - (h / 2) + 'px';
+    //     circle.style.width = w * 2 + 'px';
+    //     circle.style.height = h * 2 + 'px';
+    //     circle.style.backgroundColor = userColor;
+    //     document.body.appendChild(circle);
+
+    //     setTimeout(() => {
+    //       circle.classList.add('hiding');
+    //       setTimeout(() => {
+    //         circle.remove();
+    //       }, 1000);
+    //     }, 100);
+    //   }
+    // }
+
+    const userCircles = {};
+    let lts = 0;
+
+    function showUserCircles(ts) {
+      // const diff = ts - lts;
+
+      // Object.entries(userCircles).forEach(([i, circle]) => {
+      //   const { x, y, color, t } = circle;
+
+      //   ctx.fillStyle = color;
+      //   ctx.fillRect(x * 10, y * 10, 10, 10);
+
+      //   console.log('circle', circle, x, y, color, t);
+      //   // circle.t = 0;
+      // });
+
+      // // paintSpot()
+      // console.log('painting...', diff);
+
+      // lts = ts;
+    }
+
+    function showUserCircle(x, y, color) {
+      const i = y * 100 + x;
+      console.log(i, x, y, color);
+      userCircles[i] = { x, y, color, t: 1000 };
+      window.requestAnimationFrame(showUserCircles);
+    }
+
+    function clickedCanvas(event) {
+      const { x, y } = coordinatesFor(event);
       socket.send({
         paint: { x, y, c: currentColor }
       });
+    }
 
-      // console.log(x, y, currentColor);
-    };
+    function coordinatesFor(event) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: Math.floor((event.clientX - rect.left) / (canvas.clientWidth / 100)),
+        y: Math.floor((event.clientY - rect.top) / (canvas.clientHeight / 100)),
+      };
+    }
+
+    function appendMessage(msg) {
+      const commentEl = document.createElement('li');
+      commentEl.className = 'comment';
+      commentEl.innerText = msg.text;
+      commentEl.style.color = colorForHash(msg.hash);
+      commentsElement.insertAdjacentElement('afterbegin', commentEl);
+    }
 
     function setupColorChooser(currentColor, fn) {
       colorsHolder.innerHTML = '';
@@ -457,9 +480,7 @@
       }
     }
 
-    let myName = localStorage.getItem('myName');
-
-    commentForm.onsubmit = function(e) {
+    function sendMessage(e) {
       e.preventDefault();
       let text = textbox.value;
       const maybeName = text.match(/^\/name (\w+)$/);
@@ -467,7 +488,6 @@
       textbox.value = '';
       socket.send({ text });
 
-      console.log(maybeName && maybeName[1]);
       if (maybeName && maybeName[1]) {
         myName = maybeName[1];
         localStorage.setItem('myName', myName);
