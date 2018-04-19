@@ -290,30 +290,9 @@
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
 
-    // canvas.addEventListener('DOMMouseScroll', scrollCanvas, false);
-    // canvas.addEventListener('mousewheel', scrollCanvas, false);
-    // canvas.addEventListener('mousedown', canvasMouseDown, false);
     canvas.addEventListener('mousemove', canvasMouseMove, false);
-    // canvas.addEventListener('mouseup', canvasMouseUp, false);
 
     let grid = [];
-    let scale = 1;
-    // let lastMouse = {};
-
-    function scrollCanvas(e) {
-      e.preventDefault();
-      scale += -e.wheelDelta / 500;
-      if (scale < 0.25) scale = 0.25;
-      if (scale > 10) scale = 10;
-      repaint();
-    }
-
-    function canvasMouseDown(e) {
-      lastMouse.x = e.offsetX;
-      lastMouse.y = e.offsetY;
-      // ctx.trans
-      console.log(lastMouse);
-    }
 
     function canvasMouseMove(e) {
       repaint(); // TODO: only redraw if x/y are different than last redraw
@@ -373,8 +352,6 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.strokeStyle = '#bbb';
 
-      // ctx.scale(scale, scale);
-
       for (let i = 0; i < grid.length; i++) {
         const c = grid[i];
         let x = i % 100;
@@ -383,9 +360,6 @@
         ctx.fillRect(x * 10, y * 10, 10, 10);
         // ctx.strokeRect(x * 10, y * 10, 10, 10);
       }
-
-      // ctx.scale(-scale, -scale);
-
     }
 
     function appendMessage(msg) {
@@ -446,8 +420,8 @@
 
     canvas.onclick = event => {
       const rect = canvas.getBoundingClientRect();
-      const x = Math.floor((event.clientX - rect.left) / (canvas.clientWidth / 100) / scale);
-      const y = Math.floor((event.clientY - rect.top) / (canvas.clientHeight / 100) / scale);
+      const x = Math.floor((event.clientX - rect.left) / (canvas.clientWidth / 100));
+      const y = Math.floor((event.clientY - rect.top) / (canvas.clientHeight / 100));
 
       const i = y * 100 + x;
       repaintOne(i, currentColor);
