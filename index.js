@@ -246,21 +246,15 @@ class Throttler {
     info.last = now;
 
     info.delays.push(delay);
-    info.delays = info.delays.slice(-20);
+    info.delays = info.delays.slice(-3);
 
-    if (info.delays.length > 10) {
-      let strikes = 0;
-      for (let i = 0; i < info.delays.length - 1; i++) {
-        const a = info.delays[i];
-        const b = info.delays[i + 1];
-        const diff = Math.abs(a - b);
+    if (info.delays.length === 3) {
+      const a = Math.abs(info.delays[0] - info.delays[1]);
+      const b = Math.abs(info.delays[1] - info.delays[2]);
 
-        if (diff < 20) {
-          if (strikes++ >= 3) {
-            delete this.ips[ip];
-            return true;
-          }
-        }
+      if (a < 10 && b < 10) {
+        delete this.ips[ip];
+        return true;
       }
     }
 
