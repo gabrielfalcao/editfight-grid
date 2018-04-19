@@ -128,17 +128,6 @@
       position: relative;
     }
 
-    .userEventCircle {
-      position: absolute;
-      border-radius: 50%;
-      pointer-events: none;
-    }
-
-    .userEventCircle.hiding {
-      opacity: 0;
-      transition: opacity 1s linear;
-    }
-
     #textbox {
       font-size: inherit;
       padding: 0.5em;
@@ -370,64 +359,43 @@
       ctx.fillRect(x * 10, y * 10, 10, 10);
     }
 
-    // function repaintOne(i, c, userColor) {
-    //   let x = i % 100;
-    //   let y = Math.floor(i / 100);
-    //   ctx.fillStyle = colors[c];
-    //   ctx.fillRect(x * 10, y * 10, 10, 10);
-
-    //   if (userColor) {
-    //     const rect = canvas.getBoundingClientRect();
-
-    //     const w = (rect.width / 100);
-    //     const h = (rect.height / 100);
-
-    //     const px = (x * w) + rect.left;
-    //     const py = (y * h) + rect.top;
-
-    //     const circle = document.createElement('div');
-    //     circle.className = 'userEventCircle';
-    //     circle.style.left = px - (w / 2) + 'px';
-    //     circle.style.top = py - (h / 2) + 'px';
-    //     circle.style.width = w * 2 + 'px';
-    //     circle.style.height = h * 2 + 'px';
-    //     circle.style.backgroundColor = userColor;
-    //     document.body.appendChild(circle);
-
-    //     setTimeout(() => {
-    //       circle.classList.add('hiding');
-    //       setTimeout(() => {
-    //         circle.remove();
-    //       }, 1000);
-    //     }, 100);
-    //   }
-    // }
-
     const userCircles = {};
-    let lts = 0;
 
     function showUserCircles(ts) {
-      // const diff = ts - lts;
+      Object.entries(userCircles).forEach(([i, circle]) => {
+        const { x, y, color } = circle;
 
-      // Object.entries(userCircles).forEach(([i, circle]) => {
-      //   const { x, y, color, t } = circle;
+        const diff = circle.lastTime ? ts - circle.lastTime : 0;
+        circle.lastTime = ts;
 
-      //   ctx.fillStyle = color;
-      //   ctx.fillRect(x * 10, y * 10, 10, 10);
+        circle.t -= diff;
+        if (circle.t < 0) {
+          delete userCircles[i];
+          return;
+        }
 
-      //   console.log('circle', circle, x, y, color, t);
-      //   // circle.t = 0;
-      // });
+        paintSpot(x, y, grid[y * 100 + x]);
 
-      // // paintSpot()
-      // console.log('painting...', diff);
+        ctx.globalAlpha = circle.t / 1000.0;
+        ctx.fillStyle = color;
+        // ctx.beginPath();
+        // ctx.arc(
+        //   (x * 10) + 5,
+        //   (y * 10) + 5,
+        //   5,
+        //   0, 2 * Math.PI);
+        // ctx.fill();
+        ctx.fillRect(x * 10, y * 10, 10, 10);
+        ctx.globalAlpha = 1.0;
+      });
 
-      // lts = ts;
+      if (Object.keys(userCircles).length > 0) {
+        window.requestAnimationFrame(showUserCircles);
+      }
     }
 
     function showUserCircle(x, y, color) {
       const i = y * 100 + x;
-      console.log(i, x, y, color);
       userCircles[i] = { x, y, color, t: 1000 };
       window.requestAnimationFrame(showUserCircles);
     }
