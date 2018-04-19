@@ -230,24 +230,38 @@ class Throttler {
   }
 
   throttle(ip) {
-    if (!this.ips[ip])
-      this.ips[ip] = [];
+    const now = new Date().getTime();
 
-    let dates = this.ips[ip];
-    dates.push(new Date().getTime());
-    this.ips[ip] = dates = dates.slice(-10);
+    if (!this.ips[ip]) {
+      this.ips[ip] = {
+        last: now,
+        delays: [],
+      };
+      return false;
+    }
 
-    if (dates.length > 1) {
-      let totalDiff = 0;
+    const info = this.ips[ip];
 
-      for (let i = 0; i < dates.length - 1; i++) {
-        const a = dates[i];
-        const b = dates[i + 1];
-        const diff = b - a;
-        totalDiff += diff;
+    const delay = now - info.last;
+    info.last = now;
+
+    info.delays.push(delay);
+    info.delays = info.delays.slice(-20);
+
+    if (info.delays.length > 10) {
+      let strikes = 0;
+      for (let i = 0; i < info.delays.length - 1; i++) {
+        const a = info.delays[i];
+        const b = info.delays[i + 1];
+        const diff = Math.abs(a - b);
+
+        if (diff < 20) {
+          if (strikes++ >= 3) {
+            delete this.ips[ip];
+            return true;
+          }
+        }
       }
-
-      return totalDiff / dates.length < 150;
     }
 
     return false;
