@@ -283,6 +283,14 @@
     let myName = localStorage.getItem('myName');
     let grid = [];
 
+    for (let y = 0; y < 100; y++) {
+      const row = [];
+      for (let x = 0; x < 100; x++) {
+        row.push(0);
+      }
+      grid.push(row);
+    }
+
     canvas.onmousemove = mouseMovedOverCanvas;
     canvas.onclick = clickedCanvas;
     canvas.onmouseleave = mouseLeftCanvas;
@@ -307,10 +315,10 @@
             const hex = canvas.charAt(i);
             const c = parseInt(hex, 16);
 
-            grid[i] = c;
-
             let x = i % 100;
             let y = Math.floor(i / 100);
+
+            grid[y][x] = c;
 
             ctx.fillStyle = colors[c];
             ctx.fillRect(x * 10, y * 10, 10, 10);
@@ -319,10 +327,7 @@
 
         pixels(pixels) {
           pixels.forEach(({ x, y, c, hash }) => {
-            const i = y * 100 + x;
-
-            grid[i] = c;
-
+            grid[y][x] = c;
             paintSpot(x, y, c);
 
             if (hash) {
@@ -346,33 +351,28 @@
       }
     )
 
-    let lastHoveredGridIndex = 0;
+    let lastHoveredSpot = null;
     function mouseMovedOverCanvas(e) {
-      const { x, y } = coordinatesFor(event);
-      const i = y * 100 + x;
+      const newSpot = coordinatesFor(event);
+      const { x, y } = newSpot;
 
-      if (lastHoveredGridIndex == i)
+      if (lastHoveredSpot && lastHoveredSpot.x === x && lastHoveredSpot.y === y)
         return;
 
-      let oldX = lastHoveredGridIndex % 100;
-      let oldY = Math.floor(lastHoveredGridIndex / 100);
-      paintSpot(oldX, oldY, grid[lastHoveredGridIndex]);
+      if (lastHoveredSpot) {
+        const { x, y } = lastHoveredSpot;
+        paintSpot(x, y, grid[y][x]);
+      }
+
       paintSpot(x, y, currentColor);
 
-      // ctx.fillStyle = '#ccc';
-      // ctx.fillRect(x * 10, y * 10, 10, 10);
-
-      // ctx.fillStyle = colors[currentColor];
-      // ctx.fillRect(x * 10 + 1, y * 10 + 1, 10 - 2, 10 - 2);
-
-      lastHoveredGridIndex = i;
+      lastHoveredSpot = newSpot;
     }
 
     function mouseLeftCanvas(e) {
-      let oldX = lastHoveredGridIndex % 100;
-      let oldY = Math.floor(lastHoveredGridIndex / 100);
-      paintSpot(oldX, oldY, grid[lastHoveredGridIndex]);
-      lastHoveredGridIndex = 0;
+      const { x, y } = lastHoveredSpot;
+      paintSpot(x, y, grid[y][x]);
+      lastHoveredSpot = null;
     }
 
     function paintSpot(x, y, c) {
