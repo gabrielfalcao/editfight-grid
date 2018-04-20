@@ -285,6 +285,7 @@
 
     canvas.onmousemove = mouseMovedOverCanvas;
     canvas.onclick = clickedCanvas;
+    canvas.onmouseleave = mouseLeftCanvas;
     commentForm.onsubmit = sendMessage;
     document.onvisibilitychange = redrawEverything;
 
@@ -365,6 +366,13 @@
       // ctx.fillRect(x * 10 + 1, y * 10 + 1, 10 - 2, 10 - 2);
 
       lastHoveredGridIndex = i;
+    }
+
+    function mouseLeftCanvas(e) {
+      let oldX = lastHoveredGridIndex % 100;
+      let oldY = Math.floor(lastHoveredGridIndex / 100);
+      paintSpot(oldX, oldY, grid[lastHoveredGridIndex]);
+      lastHoveredGridIndex = 0;
     }
 
     function paintSpot(x, y, c) {
