@@ -33,6 +33,22 @@ static uint8_t palette[] = {
 
 
 
+void drawframe(ge_GIF *gif, int i, uint8_t *blank, Update *updates) {
+  memcpy(gif->frame, blank, 1000 * 1000);
+
+  for (int j = 0; j <= i; j++) {
+    Update update = updates[j];
+    uint8_t x = update.x;
+    uint8_t y = update.y;
+    uint8_t c = update.c;
+
+    for (int y2 = 0; y2 < 10; y2++) {
+      for (int x2 = 0; x2 < 10; x2++) {
+        gif->frame[(y * 10 + y2) * 1000 + (x * 10 + x2)] = c;
+      }
+    }
+  }
+}
 
 int main(int argc, char **argv) {
   if (argc < 4) {
@@ -49,7 +65,7 @@ int main(int argc, char **argv) {
   long count = ftell(file) / sizeof(Update);
   fseek(file, 0, SEEK_SET);
 
-  struct Update *updates = malloc(sizeof(Update) * count);
+  Update *updates = malloc(sizeof(Update) * count);
 
   fread(updates, sizeof(Update), count, file);
   fclose(file);
@@ -66,24 +82,14 @@ int main(int argc, char **argv) {
   double last = 0;
   int changes = 0;
 
-  for (int i = 0; i < count; i++) {
-    memcpy(gif->frame, blank, 1000 * 1000);
+  drawframe(gif, count - 1, blank, updates);
+  ge_add_frame(gif, 1);
 
-    struct Update update = updates[i];
+  for (int i = 0; i < count; i++) {
+    Update update = updates[i];
     double t = update.t;
 
-    for (int j = 0; j <= i; j++) {
-      struct Update update = updates[j];
-      uint8_t x = update.x;
-      uint8_t y = update.y;
-      uint8_t c = update.c;
-
-      for (int y2 = 0; y2 < 10; y2++) {
-        for (int x2 = 0; x2 < 10; x2++) {
-          gif->frame[(y * 10 + y2) * 1000 + (x * 10 + x2)] = c;
-        }
-      }
-    }
+    drawframe(gif, i, blank, updates);
 
     printf(".");
     fflush(stdout);
