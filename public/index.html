@@ -322,7 +322,10 @@
             grid[i] = c;
 
             paintSpot(x, y, c);
-            showUserCircle(x, y, colorForHash(hash));
+
+            if (hash) {
+              showUserCircle(x, y, hash);
+            }
           });
         },
 
