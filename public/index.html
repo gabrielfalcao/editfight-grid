@@ -426,6 +426,7 @@
       const commentEl = document.createElement('li');
       commentEl.className = 'comment';
       commentEl.innerText = msg.text;
+      commentEl.innerHTML = commentEl.innerHTML.replace(/(https?:\/\/[^\s]+)/g, "<a href='$1' target=_blank rel=noopener>$1</a>");
       commentEl.style.color = colorForHash(msg.hash);
       commentsElement.insertAdjacentElement('afterbegin', commentEl);
     }
