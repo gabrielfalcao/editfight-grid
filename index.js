@@ -167,8 +167,15 @@ class AppState {
     this.filename = filename;
     this.dirty = false;
     this.messages = [];
-    this.emptyColor = '0';
-    this.canvas = this.emptyColor.repeat(100 * 100);
+    this.canvas = '0'.repeat(100 * 100);
+    this.grid = [];
+    for (let y = 0; y < 100; y++) {
+      const row = [];
+      for (let x = 0; x < 100; x++) {
+        row.push(0);
+      }
+      this.grid.push(row);
+    }
     this.recachePayload();
   }
 
@@ -178,6 +185,13 @@ class AppState {
       this.messages = data.messages;
       this.canvas = data.canvas;
       this.dirty = false;
+      for (let i = 0; i < this.canvas.length; i++) {
+        const hex = this.canvas.charAt(i);
+        const c = parseInt(hex, 16);
+        let x = i % 100;
+        let y = Math.floor(i / 100);
+        this.grid[y][x] = c;
+      }
     }
     this.recachePayload();
   }
@@ -209,9 +223,10 @@ class AppState {
   }
 
   updatePixel(x, y, c) {
-    this.dirty = true;
+    this.grid[y][x] = c;
     const i = y * 100 + x;
     this.canvas = replaceAt(this.canvas, i, c.toString(16));
+    this.dirty = true;
     this.recachePayload();
   }
 
@@ -280,8 +295,6 @@ class TimeLapse {
     this.buffer.writeUInt8(y, 1);
     this.buffer.writeUInt8(c, 2);
     this.buffer.writeDoubleLE(t, 3);
-
-    console.log('Update', x, y, c, t, this.buffer);
 
     this.file.write(this.buffer);
   }
