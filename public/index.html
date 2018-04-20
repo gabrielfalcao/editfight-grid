@@ -143,14 +143,29 @@
       display: flex;
       overflow: auto;
       /* padding: 0.25em; */
+      list-style-type: none;
+      align-items: center;
     }
 
     .colorBox {
       position: relative;
       min-width: 2em;
       min-height: 2em;
-      list-style-type: none;
       /* margin: 0.25em; */
+      cursor: pointer;
+    }
+
+    .tool {
+      margin: 0 0.25em;
+      padding: 0.25em 0.5em;
+      white-space: nowrap;
+
+      cursor: pointer;
+      font-weight: bold;
+      color: #fff;
+      background: crimson;
+      border-bottom: 3px solid darkred;
+      border-radius: 4px;
     }
 
     .colorBox.selected {
@@ -286,6 +301,8 @@
     let currentColor = parseInt(localStorage.getItem('currentColor') || '0');
     let myName = localStorage.getItem('myName');
     let grid = [];
+    let zooming = false;
+    let zoom = null;
 
     for (let y = 0; y < 100; y++) {
       const row = [];
@@ -301,10 +318,7 @@
     commentForm.onsubmit = sendMessage;
     document.onvisibilitychange = redrawEverything;
 
-    setupColorChooser(currentColor, color => {
-      currentColor = color;
-      localStorage.setItem('currentColor', color);
-    });
+    setupToolbar();
 
     const socket = connect(
       `ws://${location.host}/app`,
@@ -358,7 +372,21 @@
     let lastHoveredSpot = null;
     function mouseMovedOverCanvas(e) {
       const newSpot = coordinatesFor(e);
-      const { x, y } = newSpot;
+      let { x, y } = newSpot;
+
+      if (zooming) {
+        redrawEverything();
+
+        const normalizedCoordinates = getZoomCoordinates(x, y);
+        x = normalizedCoordinates.x;
+        y = normalizedCoordinates.y;
+
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = '#ccc';
+        ctx.strokeRect(x * 10, y * 10, 10 * 20, 10 * 20);
+
+        return;
+      }
 
       if (lastHoveredSpot && lastHoveredSpot.x === x && lastHoveredSpot.y === y)
         return;
@@ -373,7 +401,21 @@
       lastHoveredSpot = newSpot;
     }
 
+    function getZoomCoordinates(x, y) {
+      x -= 10;
+      y -= 10;
+
+      if (x < 0) x = 0;
+      if (y < 0) y = 0;
+
+      if (x > 80) x = 80;
+      if (y > 80) y = 80;
+
+      return { x, y };
+    }
+
     function mouseLeftCanvas(e) {
+      if (!lastHoveredSpot) return;
       const { x, y } = lastHoveredSpot;
       paintSpot(x, y, grid[y][x]);
       lastHoveredSpot = null;
@@ -411,13 +453,6 @@
 
         ctx.globalAlpha = circle.t / 1000.0;
         ctx.fillStyle = color;
-        // ctx.beginPath();
-        // ctx.arc(
-        //   (x * 10) + 5,
-        //   (y * 10) + 5,
-        //   5,
-        //   0, 2 * Math.PI);
-        // ctx.fill();
         ctx.fillRect(x * 10, y * 10, 10, 10);
         ctx.globalAlpha = 1.0;
       });
@@ -434,7 +469,16 @@
     }
 
     function clickedCanvas(event) {
-      const { x, y } = coordinatesFor(event);
+      let { x, y } = coordinatesFor(event);
+
+      if (zooming) {
+        const normalizedCoordinates = getZoomCoordinates(x, y);
+        zoom = normalizedCoordinates;
+        zooming = false;
+        redrawEverything();
+        return;
+      }
+
       socket.send({
         paint: { x, y, c: currentColor }
       });
@@ -457,8 +501,25 @@
       commentsElement.insertAdjacentElement('afterbegin', commentEl);
     }
 
-    function setupColorChooser(currentColor, fn) {
+    function setupToolbar() {
       colorsHolder.innerHTML = '';
+
+      addTool('Zoom', () => {
+        if (zoom) {
+          zoom = null;
+        }
+        else {
+          zooming = true;
+        }
+      });
+
+      addColorButtons(currentColor, color => {
+        currentColor = color;
+        localStorage.setItem('currentColor', color);
+      });
+    }
+
+    function addColorButtons(currentColor, fn) {
       let selectedBox = null;
       for (let i = 0; i < 16; i++) {
         const colorBox = document.createElement('li');
@@ -480,6 +541,14 @@
 
         colorsHolder.appendChild(colorBox);
       }
+    }
+
+    function addTool(name, fn) {
+      const el = document.createElement('li');
+      el.className = 'tool';
+      el.innerText = name;
+      el.onclick = fn;
+      colorsHolder.appendChild(el);
     }
 
     function sendMessage(e) {
