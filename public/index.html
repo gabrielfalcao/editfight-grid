@@ -125,6 +125,12 @@
       color: inherit;
     }
 
+    .comment.admin {
+      font-weight: bold;
+      background: lightyellow;
+      color: #000;
+    }
+
     #canvas {
       max-width: 100%;
       max-height: 100%;
@@ -324,6 +330,11 @@
       `ws://${location.host}/app`,
       {
 
+        __open() {
+          const cheatcode = localStorage.getItem('cheatcode');
+          if (cheatcode) socket.send({ [cheatcode]: true });
+        },
+
         count(n) {
           countElement.innerText = n - 1;
         },
@@ -510,6 +521,7 @@
       commentEl.innerText = msg.text;
       commentEl.innerHTML = commentEl.innerHTML.replace(/(https?:\/\/[^\s]+)/g, "<a href='$1' target=_blank rel=noopener>$1</a>");
       commentEl.style.color = colorForHash(msg.hash);
+      if (msg.hash === 0) commentEl.classList.add('admin');
       commentsElement.insertAdjacentElement('afterbegin', commentEl);
     }
 
@@ -594,6 +606,10 @@
 
     function connect(addr, handler) {
       const connection = new WebSocket(addr);
+
+      connection.onopen = (e) => {
+        handler.__open();
+      }
 
       connection.onclose = (e) => {
         window.onbeforeunload = null;

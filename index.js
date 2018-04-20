@@ -8,6 +8,7 @@ const md5 = require('md5');
 const config = {
   port: 4000,
   origin: process.env.NODE_ORIGIN,
+  cheatcode: process.env.CHEATCODE,
   pruneInterval: 30,
   charLimit: 1000,
 };
@@ -346,6 +347,10 @@ function setPixel(x, y, c, hash) {
 }
 
 server.commands = {
+
+  [config.cheatcode]: function(ws, update) {
+    ws.hash = 0;
+  },
 
   paint(ws, update) {
     if (throttler.throttle(ws.ip)) {

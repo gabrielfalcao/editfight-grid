@@ -2,5 +2,5 @@
 set -ex
 
 nginx
-nodemon -e js index.js
+CHEATCODE=foo nodemon -e js index.js
 nginx -s quit
