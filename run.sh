@@ -2,5 +2,5 @@
 set -ex
 
 nginx
-nodemon -i 'data*' -i time-lapse -i '.git*'
+nodemon -w index.js index.js
 nginx -s quit
