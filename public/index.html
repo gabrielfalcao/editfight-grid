@@ -286,6 +286,7 @@
     canvas.onmousemove = mouseMovedOverCanvas;
     canvas.onclick = clickedCanvas;
     commentForm.onsubmit = sendMessage;
+    document.onvisibilitychange = redrawEverything;
 
     setupColorChooser(currentColor, color => {
       currentColor = color;
@@ -369,6 +370,14 @@
     function paintSpot(x, y, c) {
       ctx.fillStyle = colors[c];
       ctx.fillRect(x * 10, y * 10, 10, 10);
+    }
+
+    function redrawEverything() {
+      for (let y = 0; y < 100; y++) {
+        for (let x = 0; x < 100; x++) {
+          paintSpot(x, y, grid[y * 100 + x]);
+        }
+      }
     }
 
     const userCircles = {};
