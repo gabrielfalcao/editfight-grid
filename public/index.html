@@ -513,6 +513,17 @@
         }
       });
 
+      canvas.style.cursor = localStorage.getItem('crosshairStyle') || 'crosshair';
+      addTool('Cursor', () => {
+        if (canvas.style.cursor === 'crosshair') {
+          canvas.style.cursor = 'none';
+        }
+        else {
+          canvas.style.cursor = 'crosshair';
+        }
+        localStorage.setItem('crosshairStyle', canvas.style.cursor);
+      });
+
       addColorButtons(currentColor, color => {
         currentColor = color;
         localStorage.setItem('currentColor', color);
