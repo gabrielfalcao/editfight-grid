@@ -325,6 +325,12 @@ server.onclose = (ws) => {
   server.sendToAll({ count: server.count });
 };
 
+function setPixel(x, y, c, hash) {
+  timeLapse.add(x, y, c);
+  appState.updatePixel(x, y, c);
+  server.sendToAll({ pixels: [{ x, y, c, hash }] });
+}
+
 server.commands = {
 
   paint(ws, update) {
@@ -346,9 +352,7 @@ server.commands = {
       return;
     }
 
-    timeLapse.add(x, y, c);
-    appState.updatePixel(x, y, c);
-    server.sendToAll({ pixels: [{ x, y, c, hash: ws.hash }] });
+    setPixel(x, y, c, ws.hash);
   },
 
   text(ws, text) {
