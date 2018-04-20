@@ -334,7 +334,6 @@ server.commands = {
     }
 
     const { x, y, c } = update;
-    update.hash = ws.hash;
 
     if (
       typeof (x) !== 'number' ||
@@ -348,9 +347,8 @@ server.commands = {
     }
 
     timeLapse.add(x, y, c);
-
     appState.updatePixel(x, y, c);
-    server.sendToAll({ pixel: update });
+    server.sendToAll({ pixels: [{ x, y, c, hash: ws.hash }] });
   },
 
   text(ws, text) {

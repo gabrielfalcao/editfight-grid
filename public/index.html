@@ -315,13 +315,15 @@
           }
         },
 
-        pixel({ x, y, c, hash }) {
-          const i = y * 100 + x;
+        pixels(pixels) {
+          pixels.forEach(({ x, y, c, hash }) => {
+            const i = y * 100 + x;
 
-          grid[i] = c;
+            grid[i] = c;
 
-          paintSpot(x, y, c);
-          showUserCircle(x, y, colorForHash(hash));
+            paintSpot(x, y, c);
+            showUserCircle(x, y, colorForHash(hash));
+          });
         },
 
         message(msg) {
