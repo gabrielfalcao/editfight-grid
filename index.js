@@ -3,6 +3,7 @@
 const WebSocket = require('uws');
 const uuid = require('uuid/v4');
 const fs = require('fs');
+const md5 = require('md5');
 
 const config = {
   port: 4000,
@@ -329,7 +330,7 @@ appState.savePeriodically();
 
 
 server.onopen = (ws) => {
-  ws.hash = hashForString(ws.ip);
+  ws.hash = hashForString(md5(ws.ip));
   server.send(ws, appState.payload);
   server.sendToAll({ count: server.count });
 };
