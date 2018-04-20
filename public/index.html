@@ -323,6 +323,7 @@
     canvas.onmouseleave = mouseLeftCanvas;
     commentForm.onsubmit = sendMessage;
     document.onvisibilitychange = redrawEverything;
+    document.onkeydown = keyPressed;
 
     setupToolbar();
 
@@ -448,6 +449,23 @@
       for (let y = 0; y < 100; y++) {
         for (let x = 0; x < 100; x++) {
           paintSpot(x, y, grid[y][x]);
+        }
+      }
+    }
+
+    const keyHandlers = {
+      [37]() { zoom.x--; redrawEverything(); },
+      [39]() { zoom.x++; redrawEverything(); },
+      [38]() { zoom.y--; redrawEverything(); },
+      [40]() { zoom.y++; redrawEverything(); },
+    };
+
+    function keyPressed(e) {
+      if (zoom && document.activeElement !== textbox) {
+        const fn = keyHandlers[e.keyCode];
+        if (fn) {
+          e.preventDefault();
+          fn();
         }
       }
     }
