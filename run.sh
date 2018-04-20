@@ -2,5 +2,5 @@
 set -ex
 
 nginx
-nodemon -w index.js index.js
+nodemon -e js index.js
 nginx -s quit
