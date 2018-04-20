@@ -330,7 +330,7 @@ appState.savePeriodically();
 
 
 server.onopen = (ws) => {
-  ws.hash = hashForString(md5(ws.ip));
+  ws.hash = parseInt(md5(ws.ip), 16);
   server.send(ws, appState.payload);
   server.sendToAll({ count: server.count });
 };
