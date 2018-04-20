@@ -357,7 +357,7 @@
 
     let lastHoveredSpot = null;
     function mouseMovedOverCanvas(e) {
-      const newSpot = coordinatesFor(event);
+      const newSpot = coordinatesFor(e);
       const { x, y } = newSpot;
 
       if (lastHoveredSpot && lastHoveredSpot.x === x && lastHoveredSpot.y === y)
@@ -387,7 +387,7 @@
     function redrawEverything() {
       for (let y = 0; y < 100; y++) {
         for (let x = 0; x < 100; x++) {
-          paintSpot(x, y, grid[y * 100 + x]);
+          paintSpot(x, y, grid[y][x]);
         }
       }
     }
@@ -407,7 +407,7 @@
           return;
         }
 
-        paintSpot(x, y, grid[y * 100 + x]);
+        paintSpot(x, y, grid[y][x]);
 
         ctx.globalAlpha = circle.t / 1000.0;
         ctx.fillStyle = color;
