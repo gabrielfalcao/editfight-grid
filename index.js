@@ -410,17 +410,6 @@ function throttle(ip) {
 
 const userCommands = {
 
-  clear(ws) {
-    const result = clearVotes.vote(ws.ip);
-    if (result.passed) {
-      sendMessage({ text: `Clear-vote cast. Got ${result.votes} votes. Needed ${result.need} to clear. Clearing!`, hash: 0, status: true });
-      clearGrid();
-    }
-    else {
-      sendMessage({ text: `Clear-vote cast. Currently at ${result.votes} votes. Need ${result.need} to clear.`, hash: 0, status: true });
-    }
-  },
-
   gif(ws) {
     const result = gifVotes.vote(ws.ip);
     if (result.passed) {
