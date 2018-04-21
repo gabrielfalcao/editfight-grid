@@ -344,6 +344,11 @@ function clearGrid() {
 
 let clearVotes = {};
 
+function sendMessage(message) {
+  chat.pushMessage(message);
+  server.sendToAll({ message });
+}
+
 server.commands = {
 
   [config.cheatcode]: function(ws) {
@@ -373,19 +378,23 @@ server.commands = {
     if (text.length === 0) return;
     if (text.length > config.charLimit) return;
 
+    sendMessage({ text, hash: ws.hash, ...ws.flags });
+
     const clearVote = text.match(/^(\[\w+\]\s+)?\/clear\s*$/i);
     if (clearVote) {
       clearVotes[ws.ip] = true;
-      if (Object.keys(clearVotes).length > server.count * 0.50) {
+      const votes = Object.keys(clearVotes).length;
+      const need = Math.ceil(server.count * 0.50);
+
+      if (votes >= need) {
         clearVotes = {};
+        sendMessage({ text: `Clear-vote cast. Got ${votes} votes. Needed ${need} to clear. Clearing!`, hash: 0 });
         clearGrid();
       }
+      else {
+        sendMessage({ text: `Clear-vote cast. Currently at ${votes} votes. Need ${need} to clear.`, hash: 0 });
+      }
     }
-
-    const message = { text, hash: ws.hash, ...ws.flags };
-    chat.pushMessage(message);
-
-    server.sendToAll({ message });
   },
 
 };
