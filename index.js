@@ -240,47 +240,6 @@ class AppState {
 
 
 
-class Throttler {
-
-  constructor() {
-    this.ips = {};
-  }
-
-  throttle(ip) {
-    const now = new Date().getTime();
-
-    if (!this.ips[ip]) {
-      this.ips[ip] = {
-        last: now,
-        delays: [],
-      };
-      return false;
-    }
-
-    const info = this.ips[ip];
-
-    const delay = now - info.last;
-    info.last = now;
-
-    info.delays.push(delay);
-    info.delays = info.delays.slice(-3);
-
-    if (info.delays.length === 3) {
-      const a = Math.abs(info.delays[0] - info.delays[1]);
-      const b = Math.abs(info.delays[1] - info.delays[2]);
-
-      if (a < 10 && b < 10) {
-        console.log('KICKING', ip, a, b);
-        delete this.ips[ip];
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-}
-
 
 
 class TimeLapse {
@@ -319,7 +278,6 @@ const server = new Server({
 });
 
 const appState = new AppState('./data');
-const throttler = new Throttler();
 const timeLapse = new TimeLapse('./time-lapse');
 
 appState.loadIfExists();
@@ -353,11 +311,6 @@ server.commands = {
   },
 
   paint(ws, update) {
-    if (throttler.throttle(ws.ip)) {
-      ws.terminate();
-      return;
-    }
-
     const { x, y, c } = update;
 
     if (
