@@ -297,10 +297,19 @@ server.onclose = (ws) => {
   server.sendToAll({ count: server.count });
 };
 
+let batch = [];
+
+setInterval(() => {
+  if (batch.length > 0) {
+    server.sendToAll({ pixels: batch });
+    batch = [];
+  }
+}, 100);
+
 function setPixel(x, y, c, hash) {
   timeLapse.add(x, y, c);
   appState.updatePixel(x, y, c);
-  server.sendToAll({ pixels: [{ x, y, c, hash }] });
+  batch.push({ x, y, c, hash });
 }
 
 server.commands = {
