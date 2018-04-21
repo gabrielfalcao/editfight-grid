@@ -610,7 +610,7 @@
       let text = textbox.value;
       if (text.trim().length === 0) return;
 
-      const maybeName = text.match(/^\/name (\w+)$/);
+      const maybeName = text.match(/^\/(?:nick|name)\s+(\w+)$/);
       if (myName) text = `[${myName}] ${text}`;
       textbox.value = '';
       socket.send({ text });
