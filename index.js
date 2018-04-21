@@ -4,6 +4,7 @@ const WebSocket = require('uws');
 const uuid = require('uuid/v4');
 const fs = require('fs');
 const md5 = require('md5');
+const exec = require('child_process').execSync;
 
 const config = {
   port: 4000,
@@ -262,6 +263,7 @@ class TimeLapse {
 
   constructor(filename) {
     this.buffer = Buffer.allocUnsafe(11);
+    this.filename = filename;
     this.file = fs.createWriteStream(filename, { flags: 'a' });
   }
 
@@ -276,7 +278,32 @@ class TimeLapse {
     this.file.write(this.buffer);
   }
 
+  cut() {
+    this.file.close();
+
+    const id = new Date().getTime();
+
+    const newFilename = `${this.filename}-${id}`;
+    fs.renameSync(this.filename, newFilename);
+
+    const gifname = `timelapse-${id}.gif`;
+    const gif = `./public/${gifname}`;
+    exec(`./make-gif ${newFilename} ${gif} 30`);
+
+    this.file = fs.createWriteStream(this.filename, { flags: 'a' });
+
+    return gifname;
+  }
+
 }
+
+
+
+
+
+
+
+
 
 
 
@@ -343,6 +370,7 @@ function clearGrid() {
 }
 
 let clearVotes = {};
+let gifVotes = {};
 
 function sendMessage(message) {
   chat.pushMessage(message);
@@ -391,6 +419,23 @@ server.commands = {
     if (text.length > config.charLimit) return;
 
     sendMessage({ text, hash: ws.hash, ...ws.flags });
+
+    const gifVote = text.match(/^(\[\w+\]\s+)?\/gif\s*$/i);
+    if (gifVote) {
+      gifVotes[ws.ip] = true;
+      const votes = Object.keys(gifVotes).length;
+      const need = Math.ceil(server.count * 0.50);
+
+      if (votes >= need) {
+        gifVotes = {};
+        const gifname = timeLapse.cut();
+        clearGrid();
+        sendMessage({ text: `Gif-vote cast. Got ${votes} votes. Needed ${need} to cut new gif. New gif done! http://editfight.com/${gifname}`, hash: 0 });
+        }
+      else {
+        sendMessage({ text: `Gif-vote cast. Currently at ${votes} votes. Need ${need} to clear.`, hash: 0 });
+      }
+    }
 
     const clearVote = text.match(/^(\[\w+\]\s+)?\/clear\s*$/i);
     if (clearVote) {
