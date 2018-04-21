@@ -355,7 +355,7 @@ function throttle(ip) {
   waiting[ip] = true;
   setTimeout(() => {
     delete waiting[ip];
-  }, 250);
+  }, 100);
   return false;
 }
 
