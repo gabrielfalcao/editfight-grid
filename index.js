@@ -431,7 +431,7 @@ server.commands = {
         const gifname = timeLapse.cut();
         clearGrid();
         sendMessage({ text: `Gif-vote cast. Got ${votes} votes. Needed ${need} to cut new gif. New gif done! http://editfight.com/${gifname}`, hash: 0 });
-        }
+      }
       else {
         sendMessage({ text: `Gif-vote cast. Currently at ${votes} votes. Need ${need} to clear.`, hash: 0 });
       }
