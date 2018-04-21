@@ -388,6 +388,13 @@ class Vote {
     return { passed, votes, need };
   }
 
+  unvote(id) {
+    delete this.votes[id];
+    const votes = Object.keys(this.votes).length;
+    const need = Math.ceil(this.server.count * this.threshold);
+    return { votes, need };
+  }
+
 }
 
 let clearVotes = new Vote(server, 0.50);
@@ -413,13 +420,19 @@ const userCommands = {
   gif(ws) {
     const result = gifVotes.vote(ws.ip);
     if (result.passed) {
+      sendMessage({ text: `Gif-vote cast. Got ${result.votes} votes. Needed ${result.need} to cut new gif. Cutting new gif now!`, status: true });
       const gifname = timeLapse.cut();
       clearGrid();
-      sendMessage({ text: `Gif-vote cast. Got ${result.votes} votes. Needed ${result.need} to cut new gif. New gif done! http://editfight.com/${gifname}`, status: true });
+      sendMessage({ text: `Done. Behold: http://editfight.com/${gifname}`, status: true });
     }
     else {
       sendMessage({ text: `Gif-vote cast. Currently at ${result.votes} votes. Need ${result.need} to clear.`, status: true });
     }
+  },
+
+  ungif(ws) {
+    const result = gifVotes.unvote(ws.ip);
+    sendMessage({ text: `Gif-vote un-cast. Currently have ${result.votes} votes. Need ${result.need} to cut new gif.`, status: true });
   },
 
 };
