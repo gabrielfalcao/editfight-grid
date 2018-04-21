@@ -205,12 +205,11 @@ class AppState {
     });
   }
 
-  pushMessage(text, hash) {
-    this.messages.push({ text, hash });
+  pushMessage(msg) {
+    this.messages.push(msg);
     this.messages = this.messages.slice(-5000);
     this.dirty = true;
     this.recachePayload();
-    return this.messages[this.messages.length - 1];
   }
 
   savePeriodically() {
@@ -333,8 +332,8 @@ server.commands = {
     if (text.length === 0) return;
     if (text.length > config.charLimit) return;
 
-    const message = appState.pushMessage(text, ws.hash);
-    Object.assign(message, ws.flags);
+    const message = { text, hash: ws.hash, ...ws.flags };
+    appState.pushMessage(message);
 
     server.sendToAll({ message });
   },
