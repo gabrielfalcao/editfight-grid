@@ -163,6 +163,12 @@
       cursor: pointer;
     }
 
+    #colorsHolder .link {
+      color: blue;
+      margin: 0 0.25em;
+      padding: 0.25em 0.5em;
+    }
+
     .tool {
       margin: 0 0.25em;
       padding: 0.25em 0.5em;
@@ -237,7 +243,7 @@
   <div id="page">
 
     <ol id="colorsHolder">
-      Color chooser will go here soon.
+      <a class="link" href="/gifs.html">gifs</a>
     </ol>
 
     <div id="rest">
@@ -537,8 +543,6 @@
     }
 
     function setupToolbar() {
-      colorsHolder.innerHTML = '';
-
       addTool('Zoom', () => {
         if (zoom || zooming) {
           zooming = false;

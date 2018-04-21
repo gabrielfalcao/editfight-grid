@@ -286,7 +286,7 @@ class TimeLapse {
     const newFilename = `${this.filename}-${id}`;
     fs.renameSync(this.filename, newFilename);
 
-    const gifname = `timelapse-${id}.gif`;
+    const gifname = `gifs/timelapse-${id}.gif`;
     const gif = `./public/${gifname}`;
     exec(`./make-gif ${newFilename} ${gif} 10`);
 
