@@ -5,13 +5,6 @@
 #include <sys/stat.h>
 #include "gifenc.h"
 
-typedef struct __attribute__((__packed__)) Update {
-  uint8_t x;
-  uint8_t y;
-  uint8_t c;
-  double t;
-} Update;
-
 static uint8_t palette[] = {
   0, 0, 0,
   87, 87, 87,
@@ -39,14 +32,11 @@ int main(int argc, char **argv) {
 
   int period = atoi(argv[3]);
 
-  struct stat st;
-  stat(argv[1], &st);
-  off_t count = st.st_size / sizeof(Update);
-
-  FILE *file = fopen(argv[1], "r");
-  Update *updates = malloc(st.st_size);
-  size_t numread = fread(updates, sizeof(Update), count, file);
-  fclose(file);
+  FILE *file = fopen(argv[1], "rb");
+  unsigned char buffer[11];
+  size_t bytesRead = 0;
+  uint8_t *canvas = calloc(1000 * 1000, sizeof(uint8_t));
+  double last = 0;
 
   ge_GIF *gif = ge_new_gif(
     argv[2],
@@ -55,16 +45,11 @@ int main(int argc, char **argv) {
     0
   );
 
-  uint8_t *canvas = calloc(1000 * 1000, sizeof(uint8_t));
-
-  double last = 0;
-
-  for (int i = 0; i < count; i++) {
-    Update update = updates[i];
-    uint8_t x = update.x;
-    uint8_t y = update.y;
-    uint8_t c = update.c;
-    double t = update.t;
+  while ((bytesRead = fread(buffer, sizeof(buffer), 1, file)) > 0) {
+    uint8_t x = buffer[0];
+    uint8_t y = buffer[1];
+    uint8_t c = buffer[2];
+    double t = *((double*)(buffer + 3));
 
     for (int y2 = 0; y2 < 10; y2++) {
       for (int x2 = 0; x2 < 10; x2++) {
@@ -72,7 +57,7 @@ int main(int argc, char **argv) {
       }
     }
 
-    if (i == count - 1 || t - last > 1000.0 * period) {
+    if (t - last > 1000.0 * period) {
       memcpy(gif->frame, canvas, 1000 * 1000);
       ge_add_frame(gif, 1);
 
@@ -83,6 +68,9 @@ int main(int argc, char **argv) {
     }
   }
 
+  fclose(file);
+
+  memcpy(gif->frame, canvas, 1000 * 1000);
   ge_add_frame(gif, 1000);
   ge_close_gif(gif);
 
