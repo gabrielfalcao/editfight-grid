@@ -369,8 +369,29 @@ function clearGrid() {
   }
 }
 
-let clearVotes = {};
-let gifVotes = {};
+
+
+class Vote {
+
+  constructor(server, threshold) {
+    this.votes = {};
+    this.server = server;
+    this.threshold = threshold;
+  }
+
+  vote(id) {
+    this.votes[id] = true;
+    const votes = Object.keys(this.votes).length;
+    const need = Math.ceil(this.server.count * this.threshold);
+    const passed = votes >= need;
+    if (passed) this.votes = {};
+    return { passed, votes, need };
+  }
+
+}
+
+let clearVotes = new Vote(server, 0.50);
+let gifVotes = new Vote(server, 0.50);
 
 function sendMessage(message) {
   chat.pushMessage(message);
@@ -386,6 +407,33 @@ function throttle(ip) {
   }, 100);
   return false;
 }
+
+const userCommands = {
+
+  clear(ws) {
+    const result = clearVotes.vote(ws.ip);
+    if (result.passed) {
+      sendMessage({ text: `Clear-vote cast. Got ${result.votes} votes. Needed ${result.need} to clear. Clearing!`, hash: 0, status: true });
+      clearGrid();
+    }
+    else {
+      sendMessage({ text: `Clear-vote cast. Currently at ${result.votes} votes. Need ${result.need} to clear.`, hash: 0, status: true });
+    }
+  },
+
+  gif(ws) {
+    const result = gifVotes.vote(ws.ip);
+    if (result.passed) {
+      const gifname = timeLapse.cut();
+      clearGrid();
+      sendMessage({ text: `Gif-vote cast. Got ${result.votes} votes. Needed ${result.need} to cut new gif. New gif done! http://editfight.com/${gifname}`, hash: 0, status: true });
+    }
+    else {
+      sendMessage({ text: `Gif-vote cast. Currently at ${result.votes} votes. Need ${result.need} to clear.`, hash: 0, status: true });
+    }
+  },
+
+};
 
 server.commands = {
 
@@ -420,36 +468,12 @@ server.commands = {
 
     sendMessage({ text, hash: ws.hash, ...ws.flags });
 
-    const gifVote = text.match(/^(\[\w+\]\s+)?\/gif\s*$/i);
-    if (gifVote) {
-      gifVotes[ws.ip] = true;
-      const votes = Object.keys(gifVotes).length;
-      const need = Math.ceil(server.count * 0.50);
-
-      if (votes >= need) {
-        gifVotes = {};
-        const gifname = timeLapse.cut();
-        clearGrid();
-        sendMessage({ text: `Gif-vote cast. Got ${votes} votes. Needed ${need} to cut new gif. New gif done! http://editfight.com/${gifname}`, hash: 0 });
-      }
-      else {
-        sendMessage({ text: `Gif-vote cast. Currently at ${votes} votes. Need ${need} to clear.`, hash: 0 });
-      }
-    }
-
-    const clearVote = text.match(/^(\[\w+\]\s+)?\/clear\s*$/i);
-    if (clearVote) {
-      clearVotes[ws.ip] = true;
-      const votes = Object.keys(clearVotes).length;
-      const need = Math.ceil(server.count * 0.50);
-
-      if (votes >= need) {
-        clearVotes = {};
-        sendMessage({ text: `Clear-vote cast. Got ${votes} votes. Needed ${need} to clear. Clearing!`, hash: 0 });
-        clearGrid();
-      }
-      else {
-        sendMessage({ text: `Clear-vote cast. Currently at ${votes} votes. Need ${need} to clear.`, hash: 0 });
+    const command = text.match(/^(?:\[\w+\]\s+)?\/(.+)/);
+    if (command) {
+      const [cmd, ...args] = command[1].split(/\s/);
+      const fn = userCommands[cmd.toLowerCase()];
+      if (fn) {
+        fn(ws, ...args);
       }
     }
   },
