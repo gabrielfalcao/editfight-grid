@@ -80,7 +80,6 @@ int main(int argc, char **argv) {
   uint8_t *blank = calloc(1000 * 1000, 1);
 
   double last = 0;
-  int changes = 0;
 
   drawframe(gif, count - 1, blank, updates);
   ge_add_frame(gif, 1);
@@ -91,14 +90,11 @@ int main(int argc, char **argv) {
 
     drawframe(gif, i, blank, updates);
 
-    printf(".");
-    fflush(stdout);
-    changes++;
     if (i == count - 1 || t - last > 1000.0 * period) {
-      printf("\nAdding frame for period of %.0f seconds with %d changes\n", (t - last) / 1000.0, changes);
+      printf(".");
+      fflush(stdout);
       ge_add_frame(gif, 1);
       last = t;
-      changes = 0;
     }
   }
 
