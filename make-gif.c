@@ -34,20 +34,18 @@ static uint8_t palette[] = {
 
 
 void drawframe(ge_GIF *gif, int i, uint8_t *blank, Update *updates) {
-  memcpy(gif->frame, blank, 1000 * 1000);
+  Update update = updates[i];
+  uint8_t x = update.x;
+  uint8_t y = update.y;
+  uint8_t c = update.c;
 
-  for (int j = 0; j <= i; j++) {
-    Update update = updates[j];
-    uint8_t x = update.x;
-    uint8_t y = update.y;
-    uint8_t c = update.c;
-
-    for (int y2 = 0; y2 < 10; y2++) {
-      for (int x2 = 0; x2 < 10; x2++) {
-        gif->frame[(y * 10 + y2) * 1000 + (x * 10 + x2)] = c;
-      }
+  for (int y2 = 0; y2 < 10; y2++) {
+    for (int x2 = 0; x2 < 10; x2++) {
+      blank[(y * 10 + y2) * 1000 + (x * 10 + x2)] = c;
     }
   }
+
+  memcpy(gif->frame, blank, 1000 * 1000);
 }
 
 int main(int argc, char **argv) {
