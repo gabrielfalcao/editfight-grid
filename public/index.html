@@ -537,7 +537,7 @@
       commentEl.innerText = msg.text;
       commentEl.innerHTML = commentEl.innerHTML.replace(/(https?:\/\/[^\s]+)/g, "<a href='$1' target=_blank rel=noopener>$1</a>");
       commentEl.style.color = colorForHash(msg.hash);
-      if (msg.hash === 0) commentEl.classList.add('admin');
+      if (msg.admin) commentEl.classList.add('admin');
       commentsElement.insertAdjacentElement('afterbegin', commentEl);
     }
 

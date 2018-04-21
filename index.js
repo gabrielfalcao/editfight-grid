@@ -306,8 +306,8 @@ function setPixel(x, y, c, hash) {
 
 server.commands = {
 
-  [config.cheatcode]: function(ws, update) {
-    ws.hash = 0;
+  [config.cheatcode]: function(ws) {
+    ws.flags = { admin: true };
   },
 
   paint(ws, update) {
@@ -334,6 +334,8 @@ server.commands = {
     if (text.length > config.charLimit) return;
 
     const message = appState.pushMessage(text, ws.hash);
+    Object.assign(message, ws.flags);
+
     server.sendToAll({ message });
   },
 
