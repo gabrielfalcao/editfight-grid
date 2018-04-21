@@ -349,6 +349,16 @@ function sendMessage(message) {
   server.sendToAll({ message });
 }
 
+const waiting = {};
+function throttle(ip) {
+  if (waiting[ip]) return true;
+  waiting[ip] = true;
+  setTimeout(() => {
+    delete waiting[ip];
+  }, 250);
+  return false;
+}
+
 server.commands = {
 
   [config.cheatcode]: function(ws) {
@@ -356,6 +366,8 @@ server.commands = {
   },
 
   paint(ws, update) {
+    if (throttle(ws.ip)) return;
+
     const { x, y, c } = update;
 
     if (
