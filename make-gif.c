@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include "gifenc.h"
 
 typedef struct __attribute__((__packed__)) Update {
@@ -30,24 +31,6 @@ static uint8_t palette[] = {
   255, 255, 255,
 };
 
-
-
-
-void drawframe(ge_GIF *gif, int i, uint8_t *blank, Update *updates) {
-  Update update = updates[i];
-  uint8_t x = update.x;
-  uint8_t y = update.y;
-  uint8_t c = update.c;
-
-  for (int y2 = 0; y2 < 10; y2++) {
-    for (int x2 = 0; x2 < 10; x2++) {
-      blank[(y * 10 + y2) * 1000 + (x * 10 + x2)] = c;
-    }
-  }
-
-  memcpy(gif->frame, blank, 1000 * 1000);
-}
-
 int main(int argc, char **argv) {
   if (argc < 4) {
     fprintf(stderr, "Usage: ./make-gif <time-lapse-file> <output-gif-file> <period in seconds, eg 30>\n");
@@ -55,17 +38,14 @@ int main(int argc, char **argv) {
   }
 
   int period = atoi(argv[3]);
-  printf("Using period %d\n", period);
+
+  struct stat st;
+  stat(argv[1], &st);
+  off_t count = st.st_size / sizeof(Update);
 
   FILE *file = fopen(argv[1], "r");
-
-  fseek(file, 0, SEEK_END);
-  long count = ftell(file) / sizeof(Update);
-  fseek(file, 0, SEEK_SET);
-
-  Update *updates = malloc(sizeof(Update) * count);
-
-  fread(updates, sizeof(Update), count, file);
+  Update *updates = malloc(st.st_size);
+  size_t numread = fread(updates, sizeof(Update), count, file);
   fclose(file);
 
   ge_GIF *gif = ge_new_gif(
@@ -75,23 +55,30 @@ int main(int argc, char **argv) {
     0
   );
 
-  uint8_t *blank = calloc(1000 * 1000, 1);
+  uint8_t *canvas = calloc(1000 * 1000, sizeof(uint8_t));
 
   double last = 0;
 
-  drawframe(gif, count - 1, blank, updates);
-  ge_add_frame(gif, 1);
-
   for (int i = 0; i < count; i++) {
     Update update = updates[i];
+    uint8_t x = update.x;
+    uint8_t y = update.y;
+    uint8_t c = update.c;
     double t = update.t;
 
-    drawframe(gif, i, blank, updates);
+    for (int y2 = 0; y2 < 10; y2++) {
+      for (int x2 = 0; x2 < 10; x2++) {
+        canvas[(y * 10 + y2) * 1000 + (x * 10 + x2)] = c;
+      }
+    }
 
     if (i == count - 1 || t - last > 1000.0 * period) {
+      memcpy(gif->frame, canvas, 1000 * 1000);
+      ge_add_frame(gif, 1);
+
       printf(".");
       fflush(stdout);
-      ge_add_frame(gif, 1);
+
       last = t;
     }
   }
