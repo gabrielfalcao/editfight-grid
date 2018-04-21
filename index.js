@@ -415,10 +415,10 @@ const userCommands = {
     if (result.passed) {
       const gifname = timeLapse.cut();
       clearGrid();
-      sendMessage({ text: `Gif-vote cast. Got ${result.votes} votes. Needed ${result.need} to cut new gif. New gif done! http://editfight.com/${gifname}`, hash: 0, status: true });
+      sendMessage({ text: `Gif-vote cast. Got ${result.votes} votes. Needed ${result.need} to cut new gif. New gif done! http://editfight.com/${gifname}`, status: true });
     }
     else {
-      sendMessage({ text: `Gif-vote cast. Currently at ${result.votes} votes. Need ${result.need} to clear.`, hash: 0, status: true });
+      sendMessage({ text: `Gif-vote cast. Currently at ${result.votes} votes. Need ${result.need} to clear.`, status: true });
     }
   },
 
