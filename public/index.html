@@ -254,6 +254,8 @@
   <script>
     "use strict";
 
+    const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
     // colors based on http://alumni.media.mit.edu/~wad/color/palette.html
     const colors = [
       "rgb(0, 0, 0)",
@@ -555,16 +557,18 @@
         }
       });
 
-      canvas.style.cursor = localStorage.getItem('crosshairStyle') || 'crosshair';
-      addTool('Crosshair', () => {
-        if (canvas.style.cursor === 'crosshair') {
-          canvas.style.cursor = 'none';
-        }
-        else {
-          canvas.style.cursor = 'crosshair';
-        }
-        localStorage.setItem('crosshairStyle', canvas.style.cursor);
-      });
+      if (!isMobile) {
+        canvas.style.cursor = localStorage.getItem('crosshairStyle') || 'crosshair';
+        addTool('Crosshair', () => {
+          if (canvas.style.cursor === 'crosshair') {
+            canvas.style.cursor = 'none';
+          }
+          else {
+            canvas.style.cursor = 'crosshair';
+          }
+          localStorage.setItem('crosshairStyle', canvas.style.cursor);
+        });
+      }
 
       addColorButtons(currentColor, color => {
         currentColor = color;
