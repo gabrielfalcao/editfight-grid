@@ -3,3 +3,4 @@ node_modules/
 /grid
 /time-lapse*
 /make-gif
+*.gif
