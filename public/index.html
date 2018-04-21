@@ -262,43 +262,24 @@
 
     const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    // colors based on http://alumni.media.mit.edu/~wad/color/palette.html
-    const colors = [
-      "rgb(0, 0, 0)",
-      "rgb(87, 87, 87)",
-      "rgb(173, 35, 35)",
-      "rgb(42, 75, 215)",
-      "rgb(29, 105, 20)",
-      "rgb(129, 74, 25)",
-      "rgb(129, 38, 192)",
-      "rgb(160, 160, 160)",
-      "rgb(129, 197, 122)",
-      "rgb(157, 175, 255)",
-      "rgb(41, 208, 208)",
-      "rgb(255, 146, 51)",
-      "rgb(255, 238, 51)",
-      "rgb(233, 222, 187)",
-      "rgb(255, 205, 243)",
-      "rgb(255, 255, 255)",
-    ];
-
-    const colorNames = [
-      "Black",
-      "Dark Gray",
-      "Red",
-      "Blue",
-      "Green",
-      "Brown",
-      "Purple",
-      "Light Gray",
-      "Light Green",
-      "Light Blue",
-      "Cyan",
-      "Orange",
-      "Yellow",
-      "Tan",
-      "Pink",
-      "White",
+    // color palette based on http://alumni.media.mit.edu/~wad/color/palette.html
+    const palette = [
+      { color: "#000000", name: "Black" },
+      { color: "#575757", name: "Dark Gray" },
+      { color: "#ad2323", name: "Red" },
+      { color: "#2a4bd7", name: "Blue" },
+      { color: "#1d6914", name: "Green" },
+      { color: "#814a19", name: "Brown" },
+      { color: "#8126c0", name: "Purple" },
+      { color: "#a0a0a0", name: "Light Gray" },
+      { color: "#81c57a", name: "Light Green" },
+      { color: "#9dafff", name: "Light Blue" },
+      { color: "#29d0d0", name: "Cyan" },
+      { color: "#ff9233", name: "Orange" },
+      { color: "#ffee33", name: "Yellow" },
+      { color: "#e9debb", name: "Tan" },
+      { color: "#ffcdf3", name: "Pink" },
+      { color: "#ffffff", name: "White" },
     ];
 
     const countElement = document.getElementById('count');
@@ -439,7 +420,7 @@
     }
 
     function paintSpot(x, y, c) {
-      const color = colors[c] ? colors[c] : c;
+      const color = palette[c] ? palette[c].color : c;
       ctx.fillStyle = color;
 
       if (zoom) {
@@ -587,8 +568,8 @@
       for (let i = 0; i < 16; i++) {
         const colorBox = document.createElement('li');
         colorBox.className = 'colorBox';
-        colorBox.style.backgroundColor = colors[i];
-        colorBox.title = colorNames[i];
+        colorBox.style.backgroundColor = palette[i].color;
+        colorBox.title = palette[i].name;
         colorBox.onclick = () => {
           if (selectedBox) {
             selectedBox.classList.remove('selected');
