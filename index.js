@@ -334,6 +334,16 @@ function setPixel(x, y, c, hash) {
   batch.push({ x, y, c, hash });
 }
 
+function clearGrid() {
+  for (let y = 0; y < 100; y++) {
+    for (let x = 0; x < 100; x++) {
+      setPixel(x, y, 0, 0);
+    }
+  }
+}
+
+let clearVotes = {};
+
 server.commands = {
 
   [config.cheatcode]: function(ws) {
@@ -362,6 +372,15 @@ server.commands = {
 
     if (text.length === 0) return;
     if (text.length > config.charLimit) return;
+
+    const clearVote = text.match(/^(\[\w+\]\s+)?\/clear\s*$/i);
+    if (clearVote) {
+      clearVotes[ws.ip] = true;
+      if (Object.keys(clearVotes).length > server.count * 0.50) {
+        clearVotes = {};
+        clearGrid();
+      }
+    }
 
     const message = { text, hash: ws.hash, ...ws.flags };
     chat.pushMessage(message);
