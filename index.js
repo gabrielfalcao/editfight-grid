@@ -159,57 +159,26 @@ class Server {
 
 
 
-
-
-
-
-class AppState {
+class Chat {
 
   constructor(filename) {
     this.filename = filename;
     this.dirty = false;
     this.messages = [];
-    this.canvas = '0'.repeat(100 * 100);
-    this.grid = [];
-    for (let y = 0; y < 100; y++) {
-      const row = [];
-      for (let x = 0; x < 100; x++) {
-        row.push(0);
-      }
-      this.grid.push(row);
-    }
-    this.recachePayload();
   }
 
   loadIfExists() {
     if (fs.existsSync(this.filename)) {
-      const data = JSON.parse(fs.readFileSync(this.filename));
-      this.messages = data.messages;
-      this.canvas = data.canvas;
+      this.messages = JSON.parse(fs.readFileSync(this.filename));
       this.dirty = false;
-      for (let i = 0; i < this.canvas.length; i++) {
-        const hex = this.canvas.charAt(i);
-        const c = parseInt(hex, 16);
-        let x = i % 100;
-        let y = Math.floor(i / 100);
-        this.grid[y][x] = c;
-      }
     }
-    this.recachePayload();
-  }
-
-  recachePayload() {
-    this.payload = JSON.stringify({
-      messages: this.messages,
-      canvas: this.canvas,
-    });
+    this.savePeriodically();
   }
 
   pushMessage(msg) {
     this.messages.push(msg);
     this.messages = this.messages.slice(-5000);
     this.dirty = true;
-    this.recachePayload();
   }
 
   savePeriodically() {
@@ -220,7 +189,56 @@ class AppState {
     if (!this.dirty) return;
     this.dirty = false;
     console.log(`Saving to "${this.filename}"...`);
-    fs.writeFileSync(this.filename, this.payload);
+    fs.writeFileSync(this.filename, JSON.stringify(this.messages));
+  }
+
+}
+
+
+
+
+
+
+class Grid {
+
+  constructor(filename) {
+    this.filename = filename;
+    this.dirty = false;
+    this.canvas = '0'.repeat(100 * 100);
+    this.grid = [];
+    for (let y = 0; y < 100; y++) {
+      const row = [];
+      for (let x = 0; x < 100; x++) {
+        row.push(0);
+      }
+      this.grid.push(row);
+    }
+  }
+
+  loadIfExists() {
+    if (fs.existsSync(this.filename)) {
+      this.canvas = String(fs.readFileSync(this.filename));
+      this.dirty = false;
+      for (let i = 0; i < this.canvas.length; i++) {
+        const hex = this.canvas.charAt(i);
+        const c = parseInt(hex, 16);
+        let x = i % 100;
+        let y = Math.floor(i / 100);
+        this.grid[y][x] = c;
+      }
+    }
+    this.savePeriodically();
+  }
+
+  savePeriodically() {
+    setInterval(this.save.bind(this), 5000);
+  }
+
+  save() {
+    if (!this.dirty) return;
+    this.dirty = false;
+    console.log(`Saving to "${this.filename}"...`);
+    fs.writeFileSync(this.filename, this.canvas);
   }
 
   updatePixel(x, y, c) {
@@ -228,7 +246,6 @@ class AppState {
     const i = y * 100 + x;
     this.canvas = replaceAt(this.canvas, i, c.toString(16));
     this.dirty = true;
-    this.recachePayload();
   }
 
 }
@@ -276,11 +293,13 @@ const server = new Server({
   pruneInterval: config.pruneInterval,
 });
 
-const appState = new AppState('./data');
+const grid = new Grid('./grid');
+const chat = new Chat('./chat.json');
+
 const timeLapse = new TimeLapse('./time-lapse');
 
-appState.loadIfExists();
-appState.savePeriodically();
+grid.loadIfExists();
+chat.loadIfExists();
 
 
 
@@ -289,7 +308,10 @@ appState.savePeriodically();
 
 server.onopen = (ws) => {
   ws.hash = parseInt(md5(ws.ip), 16);
-  server.send(ws, appState.payload);
+  server.send(ws, JSON.stringify({
+    messages: chat.messages,
+    canvas: grid.canvas,
+  }));
   server.sendToAll({ count: server.count });
 };
 
@@ -308,7 +330,7 @@ setInterval(() => {
 
 function setPixel(x, y, c, hash) {
   timeLapse.add(x, y, c);
-  appState.updatePixel(x, y, c);
+  grid.updatePixel(x, y, c);
   batch.push({ x, y, c, hash });
 }
 
@@ -342,7 +364,7 @@ server.commands = {
     if (text.length > config.charLimit) return;
 
     const message = { text, hash: ws.hash, ...ws.flags };
-    appState.pushMessage(message);
+    chat.pushMessage(message);
 
     server.sendToAll({ message });
   },

@@ -1,9 +1,5 @@
 node_modules/
-data/
-/data
-/backups
+/chat.json
+/grid
 /time-lapse
-/access.log.1
-/tmp.html
 /make-gif
-/*.gif
