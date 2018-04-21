@@ -288,7 +288,7 @@ class TimeLapse {
 
     const gifname = `timelapse-${id}.gif`;
     const gif = `./public/${gifname}`;
-    exec(`./make-gif ${newFilename} ${gif} 30`);
+    exec(`./make-gif ${newFilename} ${gif} 10`);
 
     this.file = fs.createWriteStream(this.filename, { flags: 'a' });
 
