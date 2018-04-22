@@ -440,14 +440,12 @@ const userCommands = {
 
   gif(ws) {
     const result = gifVotes.vote(ws.ip);
+    sendMessage({ text: `Vote cast. Got ${result.votes}, need ${result.need}.`, status: true });
     if (result.passed) {
-      sendMessage({ text: `Vote cast. Got ${result.votes}, needed ${result.need}. Cutting new gif now!`, status: true });
+      sendMessage({ text: "Vote passed. Cutting new gif now!", status: true });
       const gifname = timeLapse.cut();
       clearGrid();
       sendMessage({ text: `Done. Behold: http://editfight.com/${gifname}`, status: true });
-    }
-    else {
-      sendMessage({ text: `Vote cast. Got ${result.votes}, need ${result.need}.`, status: true });
     }
   },
 
@@ -465,14 +463,12 @@ const userCommands = {
 
     const have = Object.keys(kickVotes[ip]).length;
     const need = Math.ceil(server.count * 0.50);
+    sendMessage({ text: `Vote cast. Got ${have}, need ${need}.`, status: true });
     if (have >= need) {
-      sendMessage({ text: `Vote cast. Got ${have}, need ${need}. User banned for 60 minutes!`, status: true });
+      sendMessage({ text: `Vote passed. User banned for 60 minutes!`, status: true });
       ban(ip);
       ws.terminate();
       delete kickVotes[ip];
-    }
-    else {
-      sendMessage({ text: `Vote cast. Got ${have}, need ${need} to ban for 60 minutes.`, status: true });
     }
   }
 
