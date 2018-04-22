@@ -403,13 +403,6 @@ class Vote {
     return { passed, votes, need };
   }
 
-  unvote(id) {
-    delete this.votes[id];
-    const votes = Object.keys(this.votes).length;
-    const need = Math.ceil(this.server.count * this.threshold);
-    return { votes, need };
-  }
-
 }
 
 let clearVotes = new Vote(server, 0.50);
@@ -456,11 +449,6 @@ const userCommands = {
     else {
       sendMessage({ text: `Vote cast. Got ${result.votes}, need ${result.need}.`, status: true });
     }
-  },
-
-  ungif(ws) {
-    const result = gifVotes.unvote(ws.ip);
-    sendMessage({ text: `Vote un-cast. Got ${result.votes}, need ${result.need} to cut new gif.`, status: true });
   },
 
   kick(ws, id) {
