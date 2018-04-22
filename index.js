@@ -519,7 +519,7 @@ server.commands = {
     if (text.length === 0) return;
     if (text.length > config.charLimit) return;
 
-    sendMessage({ text, hash: ws.hash, ...ws.flags });
+    sendMessage({ text, id: ws.id, hash: ws.hash, ...ws.flags });
 
     const command = text.match(/^(?:\[\w+\]\s+)?\/(.+)/);
     if (command) {
