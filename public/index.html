@@ -452,19 +452,19 @@
     }
 
     const keyHandlers = {
-      [37]() { zoom.x--; redrawEverything(); },
-      [39]() { zoom.x++; redrawEverything(); },
-      [38]() { zoom.y--; redrawEverything(); },
-      [40]() { zoom.y++; redrawEverything(); },
+      [37](e) { if (!zoom) return; e.preventDefault(); zoom.x--; if (zoom.x < 0) zoom.x = 0; redrawEverything(); },
+      [39](e) { if (!zoom) return; e.preventDefault(); zoom.x++; if (zoom.x > 80) zoom.x = 80; redrawEverything(); },
+      [38](e) { if (!zoom) return; e.preventDefault(); zoom.y--; if (zoom.y < 0) zoom.y = 0; redrawEverything(); },
+      [40](e) { if (!zoom) return; e.preventDefault(); zoom.y++; if (zoom.y > 80) zoom.y = 80; redrawEverything(); },
+      [189](e) { e.preventDefault(); previousColor(); },
+      [187](e) { e.preventDefault(); nextColor(); },
+      [32](e) { e.preventDefault(); e.shiftKey ? previousColor() : nextColor(); },
     };
 
     function keyPressed(e) {
-      if (zoom && document.activeElement !== textbox) {
+      if (document.activeElement !== textbox) {
         const fn = keyHandlers[e.keyCode];
-        if (fn) {
-          e.preventDefault();
-          fn();
-        }
+        if (fn) fn(e);
       }
     }
 
@@ -567,19 +567,22 @@
         });
       }
 
-      addColorButtons(currentColor, color => {
+      addColorButtons(color => {
         currentColor = color;
         localStorage.setItem('currentColor', color);
       });
+
+      chooseColor(currentColor);
     }
 
-    function addColorButtons(currentColor, fn) {
+    function addColorButtons(fn) {
       let selectedBox = null;
       for (let i = 0; i < 16; i++) {
         const colorBox = document.createElement('li');
         colorBox.className = 'colorBox';
         colorBox.style.backgroundColor = palette[i].color;
         colorBox.title = palette[i].name;
+        colorBox.dataset.i = i; // so janky
         colorBox.onclick = () => {
           if (selectedBox) {
             selectedBox.classList.remove('selected');
@@ -595,6 +598,21 @@
 
         colorsHolder.appendChild(colorBox);
       }
+    }
+
+    function chooseColor(color) {
+      if (color < 0) color = 15;
+      if (color > 15) color = 0;
+      const box = colorsHolder.querySelector(`.colorBox[data-i="${color}"]`); // soooo janky
+      box.onclick(); // too janky
+    }
+
+    function nextColor() {
+      chooseColor(currentColor + 1);
+    }
+
+    function previousColor() {
+      chooseColor(currentColor - 1);
     }
 
     function addTool(name, fn) {
