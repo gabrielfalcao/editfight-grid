@@ -182,6 +182,10 @@
       border-radius: 4px;
     }
 
+    .tool.active {
+      background: darkred;
+    }
+
     .colorBox.selected {
       border-radius: 50%;
     }
@@ -560,14 +564,16 @@
     }
 
     function setupToolbar() {
-      addTool('Zoom', () => {
+      addTool('Zoom', (e) => {
         if (zoom || zooming) {
           zooming = false;
           zoom = null;
           redrawEverything();
+          e.target.classList.remove('active');
         }
         else {
           zooming = true;
+          e.target.classList.add('active');
         }
       });
 
