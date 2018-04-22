@@ -29,6 +29,7 @@ class Server {
     this.commands = {};
     this.ips = {};
     this.count = 0;
+    this.ids = {};
   }
 
   run() {
@@ -71,6 +72,10 @@ class Server {
   connection(ws) {
     const ip = ws.upgradeReq.headers['x-forwarded-for'];
     console.log(`Connection from ${ip}`);
+
+    let id = this.ids[ip];
+    if (!id) this.ids[ip] = id = Object.keys(this.ids).length + 1;
+    ws.id = id;
 
     ws.ip = ip;
     ws.isAlive = true;
@@ -147,6 +152,14 @@ class Server {
         ws.send(data);
       }
     })
+  }
+
+  ipForId(id) {
+    let found = null;
+    this.wss.clients.forEach(ws => {
+      if (ws.id === id) found = ws;
+    });
+    return found && found.ip;
   }
 
 }
@@ -355,16 +368,16 @@ setInterval(() => {
   }
 }, 100);
 
-function setPixel(x, y, c, hash) {
+function setPixel(x, y, c, id, hash) {
   timeLapse.add(x, y, c);
   grid.updatePixel(x, y, c);
-  batch.push({ x, y, c, hash });
+  batch.push({ x, y, c, id, hash });
 }
 
 function clearGrid() {
   for (let y = 0; y < 100; y++) {
     for (let x = 0; x < 100; x++) {
-      setPixel(x, y, 0, 0);
+      setPixel(x, y, 0, null, 0);
     }
   }
 }
@@ -415,25 +428,60 @@ function throttle(ip) {
   return false;
 }
 
+const bans = {};
+
+function ban(ip) {
+  bans[ip] = true;
+  setTimeout(() => {
+    delete bans[ip];
+  }, 1000 * 60 * 60);
+}
+
+function banned(ip) {
+  return bans[ip];
+}
+
+let kickVotes = {};
+
 const userCommands = {
 
   gif(ws) {
     const result = gifVotes.vote(ws.ip);
     if (result.passed) {
-      sendMessage({ text: `Gif-vote cast. Got ${result.votes} votes. Needed ${result.need} to cut new gif. Cutting new gif now!`, status: true });
+      sendMessage({ text: `Vote cast. Got ${result.votes}, needed ${result.need}. Cutting new gif now!`, status: true });
       const gifname = timeLapse.cut();
       clearGrid();
       sendMessage({ text: `Done. Behold: http://editfight.com/${gifname}`, status: true });
     }
     else {
-      sendMessage({ text: `Gif-vote cast. Currently at ${result.votes} votes. Need ${result.need} to clear.`, status: true });
+      sendMessage({ text: `Vote cast. Got ${result.votes}, need ${result.need}.`, status: true });
     }
   },
 
   ungif(ws) {
     const result = gifVotes.unvote(ws.ip);
-    sendMessage({ text: `Gif-vote un-cast. Currently have ${result.votes} votes. Need ${result.need} to cut new gif.`, status: true });
+    sendMessage({ text: `Vote un-cast. Got ${result.votes}, need ${result.need} to cut new gif.`, status: true });
   },
+
+  kick(ws, id) {
+    id = parseInt(id);
+    if (isNaN(id)) return;
+
+    const ip = server.ipForId(id);
+    if (!ip) return;
+    if (banned(ip)) return;
+
+    kickVotes[ip] = (kickVotes[ip] || 0) + 1;
+    const have = kickVotes[ip];
+    const need = Math.ceil(server.count * 0.50);
+    if (have >= need) {
+      sendMessage({ text: `Vote cast. Got ${have}, need ${need}. User banned for 60 minutes!`, status: true });
+      ban(ip);
+    }
+    else {
+      sendMessage({ text: `Vote cast. Got ${have}, need ${need} to ban for 60 minutes.`, status: true });
+    }
+  }
 
 };
 
@@ -445,6 +493,7 @@ server.commands = {
 
   paint(ws, update) {
     if (throttle(ws.ip)) return;
+    if (banned(ws.ip)) return;
 
     const { x, y, c } = update;
 
@@ -459,10 +508,12 @@ server.commands = {
       return;
     }
 
-    setPixel(x, y, c, ws.hash);
+    setPixel(x, y, c, ws.id, ws.hash);
   },
 
   text(ws, text) {
+    if (banned(ws.ip)) return;
+
     text = text.trim();
 
     if (text.length === 0) return;

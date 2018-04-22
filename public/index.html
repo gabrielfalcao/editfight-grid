@@ -353,12 +353,12 @@
         },
 
         pixels(pixels) {
-          pixels.forEach(({ x, y, c, hash }) => {
+          pixels.forEach(({ x, y, c, id, hash }) => {
             grid[y][x] = c;
             paintSpot(x, y, c);
 
             if (hash) {
-              showUserCircle(x, y, colorForHash(hash));
+              showUserCircle(x, y, id, colorForHash(hash));
             }
           });
         },
@@ -470,9 +470,17 @@
 
     const userCircles = {};
 
+    // function repaintSpot(x, y) {
+    //   paintSpot(x, y, grid[y][x]);
+    // }
+
     function showUserCircles(ts) {
+      ctx.textAlign = 'center';
+      ctx.font = zoom ? '60px monospace' : '30px monospace';
+      ctx.lineWidth = zoom ? 6 : 2;
+
       Object.entries(userCircles).forEach(([i, circle]) => {
-        const { x, y, color } = circle;
+        const { x, y, color, id } = circle;
 
         const diff = circle.lastTime ? ts - circle.lastTime : 0;
         circle.lastTime = ts;
@@ -480,6 +488,16 @@
         circle.t -= diff;
         if (circle.t < 0) {
           delete userCircles[i];
+          redrawEverything();
+          // repaintSpot(x - 1, y - 1);
+          // repaintSpot(x, y - 1);
+          // repaintSpot(x + 1, y - 1);
+          // repaintSpot(x - 1, y);
+          // repaintSpot(x, y);
+          // repaintSpot(x + 1, y);
+          // repaintSpot(x - 1, y + 1);
+          // repaintSpot(x, y + 1);
+          // repaintSpot(x + 1, y + 1);
           return;
         }
 
@@ -487,6 +505,17 @@
 
         ctx.globalAlpha = circle.t / 1000.0;
         paintSpot(x, y, color);
+
+        const offx = zoom ? zoom.x : 0;
+        const offy = zoom ? zoom.y : 0;
+        const scale = zoom ? 5 : 1;
+
+        ctx.strokeStyle = '#000';
+        ctx.strokeText(id, (x - offx) * 10 * scale, (y - offy) * 10 * scale + 5 * scale);
+
+        ctx.fillStyle = '#fff';
+        ctx.fillText(id, (x - offx) * 10 * scale, (y - offy) * 10 * scale + 5 * scale);
+
         ctx.globalAlpha = 1.0;
       });
 
@@ -495,9 +524,9 @@
       }
     }
 
-    function showUserCircle(x, y, color) {
+    function showUserCircle(x, y, id, color) {
       const i = y * 100 + x;
-      userCircles[i] = { x, y, color, t: 1000 };
+      userCircles[i] = { x, y, id, color, t: 1000 };
       window.requestAnimationFrame(showUserCircles);
     }
 
