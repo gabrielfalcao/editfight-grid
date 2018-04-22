@@ -477,6 +477,7 @@ const userCommands = {
     if (have >= need) {
       sendMessage({ text: `Vote cast. Got ${have}, need ${need}. User banned for 60 minutes!`, status: true });
       ban(ip);
+      ws.terminate();
     }
     else {
       sendMessage({ text: `Vote cast. Got ${have}, need ${need} to ban for 60 minutes.`, status: true });
