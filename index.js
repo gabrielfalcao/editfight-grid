@@ -471,13 +471,17 @@ const userCommands = {
     if (!ip) return;
     if (banned(ip)) return;
 
-    kickVotes[ip] = (kickVotes[ip] || 0) + 1;
-    const have = kickVotes[ip];
+    if (!kickVotes[ip]) kickVotes[ip] = {};
+
+    kickVotes[ip][ws.ip] = true;
+
+    const have = Object.keys(kickVotes[ip]).length;
     const need = Math.ceil(server.count * 0.50);
     if (have >= need) {
       sendMessage({ text: `Vote cast. Got ${have}, need ${need}. User banned for 60 minutes!`, status: true });
       ban(ip);
       ws.terminate();
+      delete kickVotes[ip];
     }
     else {
       sendMessage({ text: `Vote cast. Got ${have}, need ${need} to ban for 60 minutes.`, status: true });
