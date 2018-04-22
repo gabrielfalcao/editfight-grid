@@ -326,11 +326,13 @@ class TimeLapse {
 
 
 
+const bans = {};
 
 const server = new Server({
   port: config.port,
   origin: config.origin,
   pruneInterval: config.pruneInterval,
+  shouldAllow: ip => !bans[ip],
 });
 
 const grid = new Grid('./grid');
@@ -427,8 +429,6 @@ function throttle(ip) {
   }, 100);
   return false;
 }
-
-const bans = {};
 
 function ban(ip) {
   bans[ip] = true;

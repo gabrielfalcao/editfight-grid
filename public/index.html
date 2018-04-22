@@ -470,10 +470,6 @@
 
     const userCircles = {};
 
-    // function repaintSpot(x, y) {
-    //   paintSpot(x, y, grid[y][x]);
-    // }
-
     function showUserCircles(ts) {
       ctx.textAlign = 'center';
       ctx.font = zoom ? '60px monospace' : '30px monospace';
@@ -489,15 +485,6 @@
         if (circle.t < 0) {
           delete userCircles[i];
           redrawEverything();
-          // repaintSpot(x - 1, y - 1);
-          // repaintSpot(x, y - 1);
-          // repaintSpot(x + 1, y - 1);
-          // repaintSpot(x - 1, y);
-          // repaintSpot(x, y);
-          // repaintSpot(x + 1, y);
-          // repaintSpot(x - 1, y + 1);
-          // repaintSpot(x, y + 1);
-          // repaintSpot(x + 1, y + 1);
           return;
         }
 
