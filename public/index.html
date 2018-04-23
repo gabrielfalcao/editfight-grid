@@ -269,6 +269,7 @@
     let grid = [];
     let zooming = false;
     let zoom = null;
+    let zoomButton = null;
 
     for (let y = 0; y < 100; y++) {
       const row = [];
@@ -526,16 +527,16 @@
         zooming = false;
         zoom = null;
         redrawEverything();
-        e.target.classList.remove('active');
+        zoomButton.classList.remove('active');
       }
       else {
         zooming = true;
-        e.target.classList.add('active');
+        zoomButton.classList.add('active');
       }
     }
 
     function setupToolbar() {
-      addTool('Zoom', (e) => { toggleZoom(); });
+      addTool('Zoom', () => { toggleZoom(); }, button => zoomButton = button);
 
       if (!isMobile) {
         canvas.style.cursor = localStorage.getItem('crosshairStyle') || 'crosshair';
@@ -598,12 +599,13 @@
       chooseColor(currentColor - 1);
     }
 
-    function addTool(name, fn) {
+    function addTool(name, fn, initialFn) {
       const el = document.createElement('li');
       el.className = 'tool';
       el.innerText = name;
       el.onclick = fn;
       colorsHolder.appendChild(el);
+      if (initialFn) initialFn(el);
     }
 
     function sendMessage(e) {
