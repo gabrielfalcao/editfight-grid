@@ -29,6 +29,7 @@ class Server {
     this.commands = {};
     this.ips = {};
     this.ids = {};
+    this.ipCount = 0;
   }
 
   run() {
@@ -80,6 +81,7 @@ class Server {
     ws.isAlive = true;
 
     this.ips[ws.ip] = (this.ips[ws.ip] || 0) + 1;
+    this.ipCount = Object.keys(this.ips).length;
 
     this.onopen(ws);
 
@@ -90,6 +92,7 @@ class Server {
     ws.on('close', (code, reason) => {
       this.ips[ws.ip] -= 1;
       if (!this.ips[ws.ip]) delete this.ips[ws.ip];
+      this.ipCount = Object.keys(this.ips).length;
 
       this.onclose(ws);
 
@@ -417,7 +420,7 @@ class Vote {
   vote(id) {
     this.votes[id] = true;
     const votes = Object.keys(this.votes).length;
-    const need = Math.ceil(this.server.count * this.threshold);
+    const need = Math.ceil(this.server.ipCount * this.threshold);
     const passed = votes >= need;
     if (passed) this.votes = {};
     return { passed, votes, need };
@@ -482,7 +485,7 @@ const userCommands = {
     kickVotes[ip][ws.ip] = true;
 
     const have = Object.keys(kickVotes[ip]).length;
-    const need = Math.ceil(server.count * 0.50);
+    const need = Math.ceil(server.ipCount * 0.50);
     sendMessage({ text: `Vote cast. Got ${have}, need ${need}.`, status: true });
     if (have >= need) {
       sendMessage({ text: `Vote passed. User banned for 60 minutes!`, status: true });
