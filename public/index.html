@@ -420,7 +420,7 @@
       [40](e) { if (!zoom) return; e.preventDefault(); zoom.y++; if (zoom.y > 80) zoom.y = 80; redrawEverything(); },
       [189](e) { e.preventDefault(); previousColor(); },
       [187](e) { e.preventDefault(); nextColor(); },
-      [32](e) { e.preventDefault(); e.shiftKey ? previousColor() : nextColor(); },
+      [32](e) { e.preventDefault(); toggleZoom(); },
     };
 
     function keyPressed(e) {
@@ -521,19 +521,21 @@
       commentsElement.insertAdjacentElement('afterbegin', commentEl);
     }
 
+    function toggleZoom() {
+      if (zoom || zooming) {
+        zooming = false;
+        zoom = null;
+        redrawEverything();
+        e.target.classList.remove('active');
+      }
+      else {
+        zooming = true;
+        e.target.classList.add('active');
+      }
+    }
+
     function setupToolbar() {
-      addTool('Zoom', (e) => {
-        if (zoom || zooming) {
-          zooming = false;
-          zoom = null;
-          redrawEverything();
-          e.target.classList.remove('active');
-        }
-        else {
-          zooming = true;
-          e.target.classList.add('active');
-        }
-      });
+      addTool('Zoom', (e) => { toggleZoom(); });
 
       if (!isMobile) {
         canvas.style.cursor = localStorage.getItem('crosshairStyle') || 'crosshair';
