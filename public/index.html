@@ -194,6 +194,27 @@
     .colorBox.selected {
       border-radius: 50%;
     }
+
+    .userCircle {
+      position: absolute;
+      z-index: 200;
+      color: #fff;
+      font-size: 10px;
+      visibility: none;
+      border-top: 3px solid;
+      text-shadow: 0 0 2px #000;
+    }
+
+    .userCircle.zoomed {
+      font-size: 50px;
+      border-width: 6px;
+    }
+
+    .userCircle.fading {
+      transition: opacity 2s ease-out;
+      opacity: 0;
+      visibility: initial;
+    }
   </style>
 </head>
 
@@ -431,53 +452,37 @@
       }
     }
 
-    const userCircles = {};
-
-    function showUserCircles(ts) {
-      ctx.textAlign = 'center';
-      ctx.font = zoom ? '60px monospace' : '30px monospace';
-      ctx.lineWidth = zoom ? 6 : 2;
-
-      Object.entries(userCircles).forEach(([i, circle]) => {
-        const { x, y, color, id } = circle;
-
-        const diff = circle.lastTime ? ts - circle.lastTime : 0;
-        circle.lastTime = ts;
-
-        circle.t -= diff;
-        if (circle.t < 0) {
-          delete userCircles[i];
-          redrawEverything();
-          return;
-        }
-
-        paintSpot(x, y, grid[y][x]);
-
-        ctx.globalAlpha = circle.t / 1000.0;
-        paintSpot(x, y, color);
-
-        const offx = zoom ? zoom.x : 0;
-        const offy = zoom ? zoom.y : 0;
-        const scale = zoom ? 5 : 1;
-
-        ctx.strokeStyle = '#000';
-        ctx.strokeText(id, (x - offx) * 10 * scale, (y - offy) * 10 * scale + 5 * scale);
-
-        ctx.fillStyle = '#fff';
-        ctx.fillText(id, (x - offx) * 10 * scale, (y - offy) * 10 * scale + 5 * scale);
-
-        ctx.globalAlpha = 1.0;
-      });
-
-      if (Object.keys(userCircles).length > 0) {
-        window.requestAnimationFrame(showUserCircles);
-      }
-    }
-
     function showUserCircle(x, y, id, color) {
-      const i = y * 100 + x;
-      userCircles[i] = { x, y, id, color, t: 1000 };
-      window.requestAnimationFrame(showUserCircles);
+      const offx = zoom ? zoom.x : 0;
+      const offy = zoom ? zoom.y : 0;
+      const scale = zoom ? 5 : 1;
+
+      const tw = (canvas.clientWidth / 100) * scale;
+      const th = (canvas.clientHeight / 100) * scale;
+
+      const canvasx = canvas.offsetLeft;
+      const canvasy = canvas.offsetTop;
+
+      const el = document.createElement('span');
+      el.innerText = id;
+      el.className = 'userCircle';
+      if (zoom) el.classList.add('zoomed');
+      document.body.appendChild(el);
+
+      el.style.borderColor = color;
+
+      const halfWidth = el.offsetWidth / 2.0;
+      const fullHeight = el.offsetHeight + 2;
+      const px = ((x - offx) * tw + canvasx - halfWidth + (tw / 2));
+      const py = ((y - offy) * th + canvasy - fullHeight);
+
+      el.style.left = px + 'px';
+      el.style.top = py + 'px';
+      el.classList.add('fading');
+
+      setTimeout(() => {
+        el.remove();
+      }, 2000);
     }
 
     function clickedCanvas(event) {
