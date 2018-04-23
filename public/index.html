@@ -194,48 +194,6 @@
     .colorBox.selected {
       border-radius: 50%;
     }
-
-    #welcome {
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      z-index: 2000;
-      background: #e6e4d9;
-      padding: 0 1em;
-      overflow: auto;
-    }
-
-    #welcomeContent {
-      margin: 0 auto;
-      width: 95%;
-      max-width: 30rem;
-    }
-
-    #welcomeContent>* {
-      margin: 1rem 0;
-    }
-
-    #welcome button {
-      background: #19a22d;
-      border: 0;
-      border-bottom: 3px solid #0e731d;
-      padding: 0.5em 1em;
-      font-size: inherit;
-      border-radius: 3px;
-      color: #fff;
-      cursor: pointer;
-    }
-
-    #welcome .emphasis {
-      font-weight: bold;
-      color: crimson;
-    }
-
-    #welcome.hidden {
-      display: none;
-    }
   </style>
 </head>
 
@@ -303,7 +261,6 @@
     const commentsElement = document.getElementById('comments');
     const colorsHolder = document.getElementById('colorsHolder');
     const commentForm = document.getElementById('commentForm');
-    const welcomeForm = document.getElementById('welcome');
     const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
 
