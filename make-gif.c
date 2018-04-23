@@ -82,9 +82,7 @@ int main(int argc, char **argv) {
 
   for (int y = 0; y < logo_h; y++) {
     for (int x = 0; x < logo_w; x++) {
-      int x2 = 1000 - logo_w + x;
-      int y2 = 1000 - logo_h + y;
-      canvas[y2 * 1000 + x2] = logo[y * logo_w + x];
+      canvas[y * 1000 + x] = logo[y * logo_w + x];
     }
   }
 
