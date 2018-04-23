@@ -275,20 +275,39 @@ class Grid {
 class TimeLapse {
 
   constructor(filename) {
-    this.buffer = Buffer.allocUnsafe(11);
     this.filename = filename;
     this.file = fs.createWriteStream(filename, { flags: 'a' });
+    this.q = [];
+    this.ready = true;
   }
 
   add(x, y, c) {
     const t = new Date().getTime();
+    this.q.push([x, y, c, t]);
+    this.writeIfReady();
+  }
 
-    this.buffer.writeUInt8(x, 0);
-    this.buffer.writeUInt8(y, 1);
-    this.buffer.writeUInt8(c, 2);
-    this.buffer.writeDoubleLE(t, 3);
+  writeIfReady() {
+    if (this.ready && this.q.length > 0) {
+      const [x, y, c, t] = this.q.shift();
 
-    this.file.write(this.buffer);
+      const buffer = Buffer.allocUnsafe(11);
+      buffer.writeUInt8(x, 0);
+      buffer.writeUInt8(y, 1);
+      buffer.writeUInt8(c, 2);
+      buffer.writeDoubleLE(t, 3);
+
+      if (!this.file.write(buffer)) {
+        this.ready = false;
+        this.file.once('drain', () => {
+          this.ready = true;
+          this.writeIfReady();
+        });
+      }
+      else {
+        this.writeIfReady();
+      }
+    }
   }
 
   cut() {
