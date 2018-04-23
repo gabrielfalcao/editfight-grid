@@ -305,7 +305,7 @@
     canvas.onclick = clickedCanvas;
     canvas.onmouseleave = mouseLeftCanvas;
     commentForm.onsubmit = sendMessage;
-    document.onvisibilitychange = redrawEverything;
+    document.onvisibilitychange = repaintVisibleCells;
     document.onkeydown = keyPressed;
 
     setupToolbar();
@@ -369,7 +369,7 @@
       let { x, y } = newSpot;
 
       if (zooming) {
-        redrawEverything();
+        repaintVisibleCells();
 
         const normalizedCoordinates = getZoomCoordinates(x, y);
         x = normalizedCoordinates.x;
@@ -428,19 +428,20 @@
       }
     }
 
-    function redrawEverything() {
-      for (let y = 0; y < 100; y++) {
-        for (let x = 0; x < 100; x++) {
+    function repaintVisibleCells() {
+      console.log(zoom);
+      for (let y = (zoom ? zoom.y : 0); y < (zoom ? zoom.y + 20 : 100); y++) {
+        for (let x = (zoom ? zoom.x : 0); x < (zoom ? zoom.x + 20 : 100); x++) {
           paintSpot(x, y, grid[y][x]);
         }
       }
     }
 
     const keyHandlers = {
-      [37](e) { if (!zoom) return; e.preventDefault(); zoom.x--; if (zoom.x < 0) zoom.x = 0; redrawEverything(); },
-      [39](e) { if (!zoom) return; e.preventDefault(); zoom.x++; if (zoom.x > 80) zoom.x = 80; redrawEverything(); },
-      [38](e) { if (!zoom) return; e.preventDefault(); zoom.y--; if (zoom.y < 0) zoom.y = 0; redrawEverything(); },
-      [40](e) { if (!zoom) return; e.preventDefault(); zoom.y++; if (zoom.y > 80) zoom.y = 80; redrawEverything(); },
+      [37](e) { if (!zoom) return; e.preventDefault(); zoom.x--; if (zoom.x < 0) zoom.x = 0; repaintVisibleCells(); },
+      [39](e) { if (!zoom) return; e.preventDefault(); zoom.x++; if (zoom.x > 80) zoom.x = 80; repaintVisibleCells(); },
+      [38](e) { if (!zoom) return; e.preventDefault(); zoom.y--; if (zoom.y < 0) zoom.y = 0; repaintVisibleCells(); },
+      [40](e) { if (!zoom) return; e.preventDefault(); zoom.y++; if (zoom.y > 80) zoom.y = 80; repaintVisibleCells(); },
       [189](e) { e.preventDefault(); previousColor(); },
       [187](e) { e.preventDefault(); nextColor(); },
       [32](e) { e.preventDefault(); toggleZoom(); },
@@ -493,7 +494,7 @@
         const normalizedCoordinates = getZoomCoordinates(x, y);
         zoom = normalizedCoordinates;
         zooming = false;
-        redrawEverything();
+        repaintVisibleCells();
         return;
       }
 
@@ -532,7 +533,7 @@
       if (zoom || zooming) {
         zooming = false;
         zoom = null;
-        redrawEverything();
+        repaintVisibleCells();
         zoomButton.classList.remove('active');
       }
       else {
