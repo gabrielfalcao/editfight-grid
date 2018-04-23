@@ -308,6 +308,10 @@
     document.onvisibilitychange = repaintVisibleCells;
     document.onkeydown = keyPressed;
 
+    canvas.ontouchstart = canvasTouchStart;
+    canvas.ontouchmove = canvasTouchMove;
+    canvas.ontouchend = canvasTouchEnd;
+
     setupToolbar();
 
     const socket = connect(
@@ -429,7 +433,6 @@
     }
 
     function repaintVisibleCells() {
-      console.log(zoom);
       for (let y = (zoom ? zoom.y : 0); y < (zoom ? zoom.y + 20 : 100); y++) {
         for (let x = (zoom ? zoom.x : 0); x < (zoom ? zoom.x + 20 : 100); x++) {
           paintSpot(x, y, grid[y][x]);
@@ -613,6 +616,61 @@
       el.onclick = fn;
       colorsHolder.appendChild(el);
       if (initialFn) initialFn(el);
+    }
+
+    let dragInfo = null;
+
+    function getTouchPoint(e) {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+      }
+    }
+
+    function canvasTouchStart(e) {
+      if (zoom && e.touches.length === 1) {
+        dragInfo = { ...getTouchPoint(e) };
+      }
+    }
+
+    function canvasTouchMove(e) {
+      if (zoom && dragInfo && e.touches.length === 1) {
+        const { x, y } = getTouchPoint(e);
+
+        if (!dragInfo.active) {
+          if (Math.abs(x - dragInfo.x) > 20 || Math.abs(y - dragInfo.y) > 20) {
+            dragInfo = {
+              x, y,
+              active: true
+            };
+            zoom.start = { x: zoom.x, y: zoom.y };
+          }
+        }
+
+        if (dragInfo.active) {
+          e.preventDefault();
+
+          const offx = Math.round((x - dragInfo.x) / (canvas.clientWidth / 100) / 5);
+          const offy = Math.round((y - dragInfo.y) / (canvas.clientHeight / 100) / 5);
+
+          zoom.x = zoom.start.x - offx;
+          zoom.y = zoom.start.y - offy;
+
+          if (zoom.x < 0) zoom.x = 0;
+          if (zoom.x > 80) zoom.x = 80;
+          if (zoom.y < 0) zoom.y = 0;
+          if (zoom.y > 80) zoom.y = 80;
+
+          repaintVisibleCells();
+        }
+      }
+    }
+
+    function canvasTouchEnd(e) {
+      if (dragInfo) {
+        dragInfo = null;
+      }
     }
 
     function sendMessage(e) {
