@@ -28,7 +28,6 @@ class Server {
     this.pruneInterval = options.pruneInterval;
     this.commands = {};
     this.ips = {};
-    this.count = 0;
     this.ids = {};
   }
 
@@ -81,7 +80,6 @@ class Server {
     ws.isAlive = true;
 
     this.ips[ws.ip] = (this.ips[ws.ip] || 0) + 1;
-    this.count = Object.keys(this.ips).length;
 
     this.onopen(ws);
 
@@ -92,7 +90,6 @@ class Server {
     ws.on('close', (code, reason) => {
       this.ips[ws.ip] -= 1;
       if (!this.ips[ws.ip]) delete this.ips[ws.ip];
-      this.count = Object.keys(this.ips).length;
 
       this.onclose(ws);
 
@@ -160,6 +157,10 @@ class Server {
       if (ws.id === id) found = ws;
     });
     return found && found.ip;
+  }
+
+  get count() {
+    return this.wss.clients.length;
   }
 
 }
