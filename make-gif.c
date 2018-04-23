@@ -59,27 +59,6 @@ static uint8_t logo[] = {
 
 static int logo_w = 42, logo_h = 30;
 
-void drawlogo(uint8_t *canvas) {
-  for (int y = 0; y < logo_h; y++) {
-    for (int x = 0; x < logo_w; x++) {
-      canvas[y * 1000 + x] = logo[y * logo_w + x];
-    }
-  }
-}
-
-void drawframe(unsigned char buffer[], uint8_t *canvas, double *t) {
-  uint8_t x = buffer[0];
-  uint8_t y = buffer[1];
-  uint8_t c = buffer[2];
-  *t = *((double*)(buffer + 3));
-
-  for (int y2 = 0; y2 < 10; y2++) {
-    for (int x2 = 0; x2 < 10; x2++) {
-      canvas[(y * 10 + y2) * 1000 + (x * 10 + x2)] = c;
-    }
-  }
-}
-
 int main(int argc, char **argv) {
   if (argc < 4) {
     fprintf(stderr, "Usage: ./make-gif <time-lapse-file> <output-gif-file> <period in seconds, eg 30>\n");
@@ -92,7 +71,6 @@ int main(int argc, char **argv) {
   unsigned char buffer[11];
   size_t bytesRead = 0;
   double last = 0;
-  double t;
 
   ge_GIF *gif = ge_new_gif(
     argv[2],
@@ -103,24 +81,25 @@ int main(int argc, char **argv) {
 
   uint8_t *canvas = calloc(1000 * 1000, sizeof(uint8_t));
 
-  while ((bytesRead = fread(buffer, sizeof(buffer), 1, file)) > 0) {
-    drawframe(buffer, canvas, &t);
+  for (int y = 0; y < logo_h; y++) {
+    for (int x = 0; x < logo_w; x++) {
+      canvas[y * 1000 + x] = logo[y * logo_w + x];
+    }
   }
 
-  drawlogo(canvas);
-
-  memcpy(gif->frame, canvas, 1000 * 1000);
-  ge_add_frame(gif, 1);
-
-  rewind(file);
-  bzero(canvas, 1000 * 1000);
-
-  int first = 1;
   while ((bytesRead = fread(buffer, sizeof(buffer), 1, file)) > 0) {
-    drawframe(buffer, canvas, &t);
-    drawlogo(canvas);
+    uint8_t x = buffer[0];
+    uint8_t y = buffer[1];
+    uint8_t c = buffer[2];
+    double t = *((double*)(buffer + 3));
 
-    if (first || t - last > 1000.0 * period) {
+    for (int y2 = 0; y2 < 10; y2++) {
+      for (int x2 = 0; x2 < 10; x2++) {
+        canvas[(y * 10 + y2) * 1000 + (x * 10 + x2)] = c;
+      }
+    }
+
+    if (t - last > 1000.0 * period) {
       memcpy(gif->frame, canvas, 1000 * 1000);
       ge_add_frame(gif, 1);
 
@@ -129,8 +108,6 @@ int main(int argc, char **argv) {
 
       last = t;
     }
-
-    first = 0;
   }
 
   fclose(file);
