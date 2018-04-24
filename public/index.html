@@ -292,6 +292,8 @@
     let zooming = false;
     let zoom = null;
     let zoomButton = null;
+    const colorBoxes = [];
+    let selectedColorBox = null;
 
     for (let y = 0; y < 100; y++) {
       const row = [];
@@ -561,30 +563,22 @@
         });
       }
 
-      addColorButtons(color => {
-        currentColor = color;
-        localStorage.setItem('currentColor', color);
-      });
+      addColorButtons();
 
       chooseColor(currentColor);
     }
 
-    function addColorButtons(fn) {
-      let selectedBox = null;
+    function addColorButtons() {
       for (let i = 0; i < 16; i++) {
         const colorBox = document.createElement('li');
         colorBox.className = 'colorBox';
         colorBox.style.backgroundColor = palette[i].color;
         colorBox.title = palette[i].name;
-        colorBox.dataset.i = i; // so janky
         colorBox.onclick = () => {
-          if (selectedBox) {
-            selectedBox.classList.remove('selected');
-          }
-          colorBox.classList.add('selected');
-          selectedBox = colorBox;
-          fn(i);
+          chooseColor(i);
         };
+
+        colorBoxes.push(colorBox);
 
         if (currentColor === i) {
           colorBox.onclick();
@@ -597,8 +591,14 @@
     function chooseColor(color) {
       if (color < 0) color = 15;
       if (color > 15) color = 0;
-      const box = colorsHolder.querySelector(`.colorBox[data-i="${color}"]`); // soooo janky
-      box.onclick(); // too janky
+
+      if (selectedColorBox) { selectedColorBox.classList.remove('selected'); }
+      const colorBox = colorBoxes[color];
+      colorBox.classList.add('selected');
+      selectedColorBox = colorBox;
+
+      currentColor = color;
+      localStorage.setItem('currentColor', color);
     }
 
     function nextColor() {
