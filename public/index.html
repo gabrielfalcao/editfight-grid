@@ -440,8 +440,11 @@
         ph *= scale;
       }
 
+      ctx.fillStyle = color;
+      ctx.fillRect(px, py, pw, ph);
+
       if (showGrid) {
-        ctx.fillStyle = '#333';
+        ctx.fillStyle = '#ccc4';
         ctx.fillRect(px, py, pw, ph);
         px += 1;
         py += 1;
