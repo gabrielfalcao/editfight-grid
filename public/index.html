@@ -546,7 +546,7 @@
     }
 
     function setupToolbar() {
-      addTool('Zoom', () => { toggleZoom(); }, button => zoomButton = button);
+      zoomButton = addTool('Zoom', () => { toggleZoom(); });
 
       if (!isMobile) {
         canvas.style.cursor = localStorage.getItem('crosshairStyle') || 'crosshair';
@@ -609,13 +609,13 @@
       chooseColor(currentColor - 1);
     }
 
-    function addTool(name, fn, initialFn) {
+    function addTool(name, fn) {
       const el = document.createElement('li');
       el.className = 'tool';
       el.innerText = name;
       el.onclick = fn;
       colorsHolder.appendChild(el);
-      if (initialFn) initialFn(el);
+      return el;
     }
 
     let dragInfo = null;
