@@ -292,8 +292,10 @@
     let zooming = false;
     let zoom = null;
     let zoomButton = null;
+    let gridButton = null;
     const colorBoxes = [];
     let selectedColorBox = null;
+    let showGrid = !!localStorage.getItem('showGrid');
 
     for (let y = 0; y < 100; y++) {
       const row = [];
@@ -425,12 +427,27 @@
       const color = palette[c] ? palette[c].color : c;
       ctx.fillStyle = color;
 
+      let px = x * 10;
+      let py = y * 10;
+      let pw = 10;
+      let ph = 10;
+
       if (zoom) {
         const scale = 5;
-        ctx.fillRect((x - zoom.x) * 10 * scale, (y - zoom.y) * 10 * scale, 10 * scale, 10 * scale);
+
+        px = (x - zoom.x) * 10 * scale;
+        py = (y - zoom.y) * 10 * scale;
+
+        pw *= scale;
+        ph *= scale;
       }
-      else {
-        ctx.fillRect(x * 10, y * 10, 10, 10);
+
+      ctx.fillRect(px, py, pw, ph);
+
+      if (showGrid) {
+        ctx.strokeStyle = '#ccc4';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(px, py, pw, ph);
       }
     }
 
@@ -547,8 +564,25 @@
       }
     }
 
+    function toggleGrid() {
+      showGrid = !showGrid;
+      localStorage.setItem('showGrid', showGrid ? 'yes' : '');
+
+      if (showGrid)
+        gridButton.classList.add('active');
+      else
+        gridButton.classList.remove('active');
+
+      repaintVisibleCells();
+    }
+
     function setupToolbar() {
       zoomButton = addTool('Zoom', () => { toggleZoom(); });
+
+      gridButton = addTool('Grid', () => {
+        toggleGrid();
+      });
+      if (showGrid) gridButton.classList.add('active');
 
       if (!isMobile) {
         canvas.style.cursor = localStorage.getItem('crosshairStyle') || 'crosshair';
