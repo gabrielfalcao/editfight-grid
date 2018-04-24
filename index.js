@@ -355,7 +355,6 @@ const server = new Server({
   port: config.port,
   origin: config.origin,
   pruneInterval: config.pruneInterval,
-  shouldAllow: ip => !bans[ip],
 });
 
 const grid = new Grid('./grid');
@@ -490,7 +489,6 @@ const userCommands = {
     if (have >= need) {
       sendMessage({ text: `Vote passed. User banned for 60 minutes!`, status: true });
       ban(ip);
-      ws.terminate();
       delete kickVotes[ip];
     }
   }
