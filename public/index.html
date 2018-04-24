@@ -201,7 +201,6 @@
       color: #fff;
       font-size: 10px;
       visibility: none;
-      border-top: 3px solid;
       text-shadow: 0 0 2px #000;
       pointer-events: none;
     }
@@ -492,8 +491,6 @@
       el.className = 'userCircle';
       if (zoom) el.classList.add('zoomed');
       document.body.appendChild(el);
-
-      el.style.borderColor = color;
 
       const halfWidth = el.offsetWidth / 2.0;
       const fullHeight = el.offsetHeight + 2;
