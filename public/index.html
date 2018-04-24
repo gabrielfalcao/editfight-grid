@@ -476,7 +476,7 @@
     };
 
     function keyPressed(e) {
-      if (document.activeElement !== textbox) {
+      if (!e.metaKey && document.activeElement !== textbox) {
         const fn = keyHandlers[e.keyCode];
         if (fn) fn(e);
       }
