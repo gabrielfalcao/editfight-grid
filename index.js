@@ -436,15 +436,15 @@ function sendMessage(message) {
   server.sendToAll({ message });
 }
 
-const waiting = {};
-function throttle(ip) {
-  if (waiting[ip]) return true;
-  waiting[ip] = true;
-  setTimeout(() => {
-    delete waiting[ip];
-  }, 100);
-  return false;
-}
+// const waiting = {};
+// function throttle(ip) {
+//   if (waiting[ip]) return true;
+//   waiting[ip] = true;
+//   setTimeout(() => {
+//     delete waiting[ip];
+//   }, 100);
+//   return false;
+// }
 
 function ban(ip) {
   bans[ip] = true;
@@ -504,7 +504,7 @@ server.commands = {
   },
 
   paint(ws, update) {
-    if (throttle(ws.ip)) return;
+    // if (throttle(ws.ip)) return;
     if (banned(ws.ip)) return;
 
     const { x, y, c } = update;
