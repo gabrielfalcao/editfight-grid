@@ -424,7 +424,6 @@
 
     function paintSpot(x, y, c) {
       const color = palette[c] ? palette[c].color : c;
-      ctx.fillStyle = color;
 
       let px = x * 10;
       let py = y * 10;
@@ -441,13 +440,17 @@
         ph *= scale;
       }
 
-      ctx.fillRect(px, py, pw, ph);
-
       if (showGrid) {
-        ctx.strokeStyle = '#ccc4';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(px, py, pw, ph);
+        ctx.fillStyle = '#333';
+        ctx.fillRect(px, py, pw, ph);
+        px += 1;
+        py += 1;
+        pw -= 2;
+        ph -= 2;
       }
+
+      ctx.fillStyle = color;
+      ctx.fillRect(px, py, pw, ph);
     }
 
     function repaintVisibleCells() {
