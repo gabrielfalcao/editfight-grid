@@ -216,6 +216,19 @@
       opacity: 0;
       visibility: initial;
     }
+
+    .bs-icon {
+      display: inline-block;
+      fill: none;
+      font-size: 1em;
+      width: 1em;
+      stroke: currentColor;
+      stroke-width: inherit;
+      stroke-linecap: inherit;
+      stroke-linejoin: inherit;
+      overflow: visible;
+      stroke-width: 8%;
+    }
   </style>
 </head>
 
@@ -232,6 +245,15 @@
       <!-- <span>Made with &#x2764;</span> -->
       <a class="link" href="/gifs.html">gifs</a>
       <a class="link" target="blank" rel="noopener" href="https://www.paypal.com/cgi-bin/webscr?business=sbdegutis@gmail.com&cmd=_donations&item_name=EditFight%20donation&no_shipping=1">Donate</a>
+      <li class="tool" id="zoomButton">
+        <svg class="bs-icon" viewBox="0 0 32 32">
+          <circle cx="14" cy="14" r="12"></circle>
+          <path d="M23 23 L30 30"></path>
+        </svg>
+      </li>
+      <li class="tool" id="gridButton">
+        Grid
+      </li>
     </ol>
 
     <div id="rest">
@@ -291,8 +313,8 @@
     let grid = [];
     let zooming = false;
     let zoom = null;
-    let zoomButton = null;
-    let gridButton = null;
+    let zoomButton = document.getElementById('zoomButton');
+    let gridButton = document.getElementById('gridButton');
     let crosshairButton = null;
     const colorBoxes = [];
     let selectedColorBox = null;
@@ -593,11 +615,9 @@
     }
 
     function setupToolbar() {
-      zoomButton = addTool('Zoom', () => { toggleZoom(); });
+      zoomButton.onclick = () => { toggleZoom(); };
+      gridButton.onclick = () => { toggleGrid(); };
 
-      gridButton = addTool('Grid', () => {
-        toggleGrid();
-      });
       if (showGrid) gridButton.classList.add('active');
 
       if (!isMobile) {
@@ -657,7 +677,7 @@
     function addTool(name, fn) {
       const el = document.createElement('li');
       el.className = 'tool';
-      el.innerText = name;
+      el.innerHTML = name;
       el.onclick = fn;
       colorsHolder.appendChild(el);
       return el;
