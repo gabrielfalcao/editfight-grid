@@ -23,13 +23,21 @@ Since there's only 16 colors (intentionally), each pixel in the 100x100 grid can
 be represented by a single hex-encoded byte. So every time a client connects,
 the server sends it a 10,000-character string representing the grid.
 
-The front-end is designed to be just as usable on mobile as on desktop, but
-something like 85% of users are desktop users which makes that kind of
-pointless. And keeping up the mobile usability is dragging down the desktop
-usability. So I'm probably going to make it easier on desktop.
-
 I used [gifenc](https://github.com/lecram/gifenc/) to create the time-lapse
 gifs, which was surprisingly simple to use, and pretty fast too.
+
+### Upcoming features
+
+- [ ] Better color palette. Maybe like 7 colors and 4-5 variations of them. More like a grid.
+- [ ] Zoom and grid buttons should have icons and not words.
+- [ ] Button that shows/hide a shortcut list.
+- [ ] Thumbnail preview when zoomed in.
+- [ ] Say that it’s loading instead of just looking broken...
+- [ ] The toolbar and color chooser should be separate.
+- [ ] Maybe a way to resize chat box or something so you can see more.
+- [ ] /warn feature for griefers
+- [ ] Show user explanation when kicked.
+- [ ] Try some compression of initial data for faster loading time. See if it helps on super-slow connections.
 
 ### Run locally
 
