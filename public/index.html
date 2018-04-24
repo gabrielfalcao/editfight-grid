@@ -292,6 +292,7 @@
     let zoom = null;
     let zoomButton = null;
     let gridButton = null;
+    let crosshairButton = null;
     const colorBoxes = [];
     let selectedColorBox = null;
     let showGrid = !!localStorage.getItem('showGrid');
@@ -578,6 +579,18 @@
       repaintVisibleCells();
     }
 
+    function toggleCrosshair() {
+      if (canvas.style.cursor === 'crosshair') {
+        canvas.style.cursor = 'none';
+        crosshairButton.classList.remove('active');
+      }
+      else {
+        canvas.style.cursor = 'crosshair';
+        crosshairButton.classList.add('active');
+      }
+      localStorage.setItem('crosshairStyle', canvas.style.cursor);
+    }
+
     function setupToolbar() {
       zoomButton = addTool('Zoom', () => { toggleZoom(); });
 
@@ -588,15 +601,10 @@
 
       if (!isMobile) {
         canvas.style.cursor = localStorage.getItem('crosshairStyle') || 'crosshair';
-        addTool('Crosshair', () => {
-          if (canvas.style.cursor === 'crosshair') {
-            canvas.style.cursor = 'none';
-          }
-          else {
-            canvas.style.cursor = 'crosshair';
-          }
-          localStorage.setItem('crosshairStyle', canvas.style.cursor);
+        crosshairButton = addTool('Crosshair', () => {
+          toggleCrosshair();
         });
+        if (canvas.style.cursor === 'crosshair') crosshairButton.classList.add('active');
       }
 
       addColorButtons();
