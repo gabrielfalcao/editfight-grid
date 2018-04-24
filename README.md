@@ -38,6 +38,8 @@ gifs, which was surprisingly simple to use, and pretty fast too.
 - [ ] /warn feature for griefers
 - [ ] Show user explanation when kicked.
 - [ ] Try some compression of initial data for faster loading time. See if it helps on super-slow connections.
+- [ ] /kick should be renamed since it's not really kicking them out, just stopping them from participating for a short while.
+- [ ] /kick should increment time they're disabled, increasing the interval at every new kick (per IP). Maybe like 2 minutes, then 4, 8, 16, etc.
 
 ### Run locally
 
