@@ -230,6 +230,51 @@
       overflow: visible;
       stroke-width: 8%;
     }
+
+    #cheatsheet {
+      z-index: 300;
+      background: #ccc;
+      position: fixed;
+
+      left: 0;
+      width: 100%;
+
+      top: 10%;
+      max-height: 90%;
+
+      overflow: scroll;
+    }
+
+    #cheatsheetInner {
+      width: 90%;
+      max-width: 30em;
+      margin: 0 auto;
+    }
+
+    #cheatsheetInner p {
+      margin: 1em 0;
+    }
+
+    #cheatsheet button {
+      margin: 0 0.25em;
+      padding: 0.25em 0.5em;
+      white-space: nowrap;
+
+      text-decoration: none;
+
+      cursor: pointer;
+      font-weight: bold;
+      color: #fff;
+      background: crimson;
+      border-bottom: 3px solid darkred;
+      border-radius: 4px;
+
+      font-size: inherit;
+    }
+
+    code {
+      font-family: monospace;
+    }
   </style>
 </head>
 
@@ -239,8 +284,36 @@
     There was once an error. One day, the error existed. The end.
   </div>
 
-  <div id="page">
+  <div id="cheatsheet" class="hidden">
+    <div id="cheatsheetInner">
+      <p>
+        <b>Quick info.</b>
+      </p>
+      <p>
+        <b>/gif</b> &mdash; You can use
+        <code>/gif</code> to vote for turning everyone's work into a timelapse gif and clearing the canvas. Needs at least 50% of active users
+        to vote to pass.</p>
+      <p>
+        <b>/kick N</b> &mdash; You can use
+        <code>/kick N</code> where N is someone's number, to vote to kick them. Use cautiously. This is only for trolls who don't listen and
+        destroy everything. Needs at least 50% of active users to vote to pass. Disables controls for banned user for 60
+        minutes.
+      </p>
+      <p>
+        <b>OP</b> &mdash; I (OP) made this site with &lt;3 for fun. I check in at least once a day, so if you have any feedback
+        or feature requests please leave them in the chat section so I can see it.</p>
+      <p>
+        <b>Donate</b> &mdash; If you like this site and have the ability, please
+        <a target="blank" rel="noopener" href="https://www.paypal.com/cgi-bin/webscr?business=sbdegutis@gmail.com&cmd=_donations&item_name=EditFight%20donation&no_shipping=1">donate a few dollars</a>! It helps the cost of the software that runs the site. I don't sell ads and never will so
+        this is the only funding for the site.
+      </p>
+      <p>
+        <button id="hideCheatsheetButton">Close</button>
+      </p>
+    </div>
+  </div>
 
+  <div id="page">
 
     <ol id="colorsHolder">
       <!-- <span>Made with &#x2764;</span> -->
@@ -260,6 +333,12 @@
       <li class="tool hidden" id="crosshairButton">
         <svg class="bs-icon" viewBox="0 0 32 32">
           <path d="M16 2 L16 30 M2 16 L30 16"></path>
+        </svg>
+      </li>
+      <li class="tool" id="cheatsheetButton">
+        <svg id="i-info" class="bs-icon" viewBox="0 0 32 32">
+          <path d="M16 14 L16 23 M16 8 L16 10"></path>
+          <circle cx="16" cy="16" r="14"></circle>
         </svg>
       </li>
     </ol>
@@ -324,6 +403,9 @@
     const zoomButton = document.getElementById('zoomButton');
     const gridButton = document.getElementById('gridButton');
     const crosshairButton = document.getElementById('crosshairButton');
+    const cheatsheetButton = document.getElementById('cheatsheetButton');
+    const hideCheatsheetButton = document.getElementById('hideCheatsheetButton');
+    const cheatsheet = document.getElementById('cheatsheet');
     const colorBoxes = [];
     let selectedColorBox = null;
     let showGrid = !!localStorage.getItem('showGrid');
@@ -622,9 +704,27 @@
       localStorage.setItem('crosshairStyle', canvas.style.cursor);
     }
 
+    function showCheatsheet() {
+      cheatsheet.classList.remove('hidden');
+    }
+
+    function closeCheatsheet() {
+      cheatsheet.classList.add('hidden');
+    }
+
+    // icons borrowed from https://danklammer.com/articles/svg-stroke-ftw/#give-it-a-spin
+    // license = https://github.com/danklammer/bytesize-icons/blob/master/LICENSE.md
+    // i declare that this legally counts as including the MIT copyright and permission notices.
     function setupToolbar() {
       zoomButton.onclick = () => { toggleZoom(); };
       gridButton.onclick = () => { toggleGrid(); };
+      cheatsheetButton.onclick = () => {
+        if (cheatsheet.classList.contains('hidden'))
+          showCheatsheet();
+        else
+          closeCheatsheet();
+      }
+      hideCheatsheetButton.onclick = () => { closeCheatsheet(); }
 
       if (showGrid) gridButton.classList.add('active');
 

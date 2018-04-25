@@ -29,8 +29,8 @@ gifs, which was surprisingly simple to use, and pretty fast too.
 ### Upcoming features
 
 - [ ] Better color palette. Maybe like 7 colors and 4-5 variations of them. More like a grid.
-- [ ] Zoom and grid buttons should have icons and not words.
-- [ ] Button that shows/hide a shortcut list.
+- [x] Zoom and grid buttons should have icons and not words.
+- [x] Button that shows/hide a shortcut list.
 - [ ] Thumbnail preview when zoomed in.
 - [ ] Say that it’s loading instead of just looking broken...
 - [ ] The toolbar and color chooser should be separate.
