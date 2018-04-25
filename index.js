@@ -195,7 +195,7 @@ class Chat {
 
   pushMessage(msg) {
     this.messages.push(msg);
-    this.messages = this.messages.slice(-5000);
+    this.messages = this.messages.slice(-200);
     this.dirty = true;
   }
 
