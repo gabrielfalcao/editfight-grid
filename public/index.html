@@ -861,14 +861,15 @@
       let text = textbox.value;
       if (text.trim().length === 0) return;
 
-      const maybeName = text.match(/^\/(?:nick|name)\s+(\w+)$/);
+      const maybeName = text.match(/^\/(?:nick|name)\s+(.+)$/);
       if (myName) text = `[${myName}] ${text}`;
       textbox.value = '';
       socket.send({ text });
 
-      if (maybeName && maybeName[1]) {
-        myName = maybeName[1];
+      if (maybeName && maybeName[1] && maybeName[1].trim()) {
+        myName = maybeName[1].trim();
         localStorage.setItem('myName', myName);
+        socket.send({ text: `[${myName}] Henceforth I shalt be known as ${myName}` });
       }
     }
 
