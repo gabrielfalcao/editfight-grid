@@ -28,19 +28,21 @@ gifs, which was surprisingly simple to use, and pretty fast too.
 
 ### Upcoming features
 
-- [x] Better color palette. Maybe like 7 colors and 4-5 variations of them. More like a grid.
-- [ ] Easier way to choose colors.
-- [ ] Scroll wheel cycles between colors.
-- [ ] Choose color at given pixel.
+- [x] 32 colors.
+- [ ] Easier to use color picker.
+- [ ] Scroll wheel cycles between most recently used colors.
+- [ ] Choose color at given pixel with middle-click.
+- [ ] Left-click and right-click have their own colors.
 - [x] Zoom and grid buttons should have icons and not words.
-- [x] Button that shows/hide a shortcut list.
+- [ ] Make a side-bar with hamburger button that pops up with gifs/source/donate links.
+- [ ] Move shortcut list to that hamburger menu.
 - [ ] Thumbnail preview when zoomed in.
 - [ ] Say that it’s loading instead of just looking broken...
-- [ ] The toolbar and color chooser should be separate.
-- [ ] Maybe a way to resize chat box or something so you can see more.
+- [ ] The toolbar and color chooser should be separate floating bars.
+- [ ] Maybe a toggle button to resize chat box or something so you can see more.
 - [ ] /warn feature for griefers
-- [ ] Show user explanation when kicked.
-- [x] Try some compression of initial data for faster loading time. See if it helps on super-slow connections.
+- [ ] Show user an explanation when kicked.
+- [ ] Try some compression of initial data for faster loading time. See if it helps on super-slow connections.
 - [ ] /kick should be renamed since it's not really kicking them out, just stopping them from participating for a short while.
 - [ ] /kick should increment time they're disabled, increasing the interval at every new kick (per IP). Maybe like 2 minutes, then 4, 8, 16, etc.
 - [ ] Fix time-lapse gifs page (gifs.html), because they all start playing at once and that hurts performance a lot.
