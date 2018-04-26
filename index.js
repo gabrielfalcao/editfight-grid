@@ -225,7 +225,7 @@ class Grid {
   constructor(filename) {
     this.filename = filename;
     this.dirty = false;
-    this.canvas = '0'.repeat(100 * 100);
+    this.canvas = 'p'.repeat(100 * 100);
     this.grid = [];
     for (let y = 0; y < 100; y++) {
       const row = [];
@@ -242,7 +242,7 @@ class Grid {
       this.dirty = false;
       for (let i = 0; i < this.canvas.length; i++) {
         const hex = this.canvas.charAt(i);
-        const c = parseInt(hex, 16);
+        const c = parseInt(hex, 32);
         let x = i % 100;
         let y = Math.floor(i / 100);
         this.grid[y][x] = c;
@@ -265,7 +265,7 @@ class Grid {
   updatePixel(x, y, c) {
     this.grid[y][x] = c;
     const i = y * 100 + x;
-    this.canvas = replaceAt(this.canvas, i, c.toString(16));
+    this.canvas = replaceAt(this.canvas, i, c.toString(32));
     this.dirty = true;
   }
 
@@ -404,7 +404,7 @@ function setPixel(x, y, c, id, hash) {
 function clearGrid() {
   for (let y = 0; y < 100; y++) {
     for (let x = 0; x < 100; x++) {
-      setPixel(x, y, 0, null, 0);
+      setPixel(x, y, 25, null, 0);
     }
   }
 }
@@ -515,7 +515,7 @@ server.commands = {
       typeof (c) !== 'number' ||
       x < 0 || x > 99 ||
       y < 0 || y > 99 ||
-      c < 0 || c > 15
+      c < 0 || c > 31
     ) {
       return;
     }

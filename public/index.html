@@ -388,24 +388,40 @@
 
     const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-    // color palette based on http://alumni.media.mit.edu/~wad/color/palette.html
+    // color palette https://lospec.com/palette-list/endesga-32
     const palette = [
-      { color: "#000000", name: "Black" },
-      { color: "#575757", name: "Dark Gray" },
-      { color: "#ad2323", name: "Red" },
-      { color: "#2a4bd7", name: "Blue" },
-      { color: "#1d6914", name: "Green" },
-      { color: "#814a19", name: "Brown" },
-      { color: "#8126c0", name: "Purple" },
-      { color: "#a0a0a0", name: "Light Gray" },
-      { color: "#81c57a", name: "Light Green" },
-      { color: "#9dafff", name: "Light Blue" },
-      { color: "#29d0d0", name: "Cyan" },
-      { color: "#ff9233", name: "Orange" },
-      { color: "#ffee33", name: "Yellow" },
-      { color: "#e9debb", name: "Tan" },
-      { color: "#ffcdf3", name: "Pink" },
-      { color: "#ffffff", name: "White" },
+      { color: "#be4a2f" },
+      { color: "#d77643" },
+      { color: "#ead4aa" },
+      { color: "#e4a672" },
+      { color: "#b86f50" },
+      { color: "#733e39" },
+      { color: "#3e2731" },
+      { color: "#a22633" },
+      { color: "#e43b44" },
+      { color: "#f77622" },
+      { color: "#feae34" },
+      { color: "#fee761" },
+      { color: "#63c74d" },
+      { color: "#3e8948" },
+      { color: "#265c42" },
+      { color: "#193c3e" },
+      { color: "#124e89" },
+      { color: "#0099db" },
+      { color: "#2ce8f5" },
+      { color: "#ffffff" },
+      { color: "#c0cbdc" },
+      { color: "#8b9bb4" },
+      { color: "#5a6988" },
+      { color: "#3a4466" },
+      { color: "#262b44" },
+      { color: "#181425" },
+      { color: "#ff0044" },
+      { color: "#68386c" },
+      { color: "#b55088" },
+      { color: "#f6757a" },
+      { color: "#e8b796" },
+      { color: "#c28569" },
     ];
 
     const countElement = document.getElementById('count');
@@ -468,7 +484,7 @@
         canvas(canvas) {
           for (let i = 0; i < canvas.length; i++) {
             const hex = canvas.charAt(i);
-            const c = parseInt(hex, 16);
+            const c = parseInt(hex, 32);
 
             let x = i % 100;
             let y = Math.floor(i / 100);
@@ -762,7 +778,7 @@
     }
 
     function addColorButtons() {
-      for (let i = 0; i < 16; i++) {
+      for (let i = 0; i < 32; i++) {
         const colorBox = document.createElement('span');
         colorBox.className = 'colorBox';
         colorBox.style.backgroundColor = palette[i].color;
@@ -782,8 +798,8 @@
     }
 
     function chooseColor(color) {
-      if (color < 0) color = 15;
-      if (color > 15) color = 0;
+      if (color < 0) color = 31;
+      if (color > 31) color = 0;
 
       if (selectedColorBox) { selectedColorBox.classList.remove('selected'); }
       const colorBox = colorBoxes[color];
