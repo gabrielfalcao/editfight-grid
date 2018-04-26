@@ -147,9 +147,12 @@ class Server {
       ? msg
       : JSON.stringify(msg);
 
+    const payload = lzw_encode(data);
+    console.log(`Payload was ${data.length}, is ${payload.length}, saved ${data.length - payload.length} bytes.`);
+
     clients.forEach((ws) => {
       if (ws.readyState === WebSocket.OPEN) {
-        ws.send(data);
+        ws.send(payload);
       }
     })
   }
@@ -567,4 +570,32 @@ function hashForString(str) {
     hash = str.charCodeAt(i) + ((hash << 5) - hash);
   }
   return hash;
+}
+
+
+
+function lzw_encode(s) {
+  var dict = {};
+  var data = (s + "").split("");
+  var out = [];
+  var currChar;
+  var phrase = data[0];
+  var code = 256;
+  for (var i = 1; i < data.length; i++) {
+    currChar = data[i];
+    if (dict['_' + phrase + currChar] != null) {
+      phrase += currChar;
+    }
+    else {
+      out.push(phrase.length > 1 ? dict['_' + phrase] : phrase.charCodeAt(0));
+      dict['_' + phrase + currChar] = code;
+      code++;
+      phrase = currChar;
+    }
+  }
+  out.push(phrase.length > 1 ? dict['_' + phrase] : phrase.charCodeAt(0));
+  for (var i = 0; i < out.length; i++) {
+    out[i] = String.fromCharCode(out[i]);
+  }
+  return out.join("");
 }
