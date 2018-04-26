@@ -390,70 +390,22 @@
 
     // color palette based on http://alumni.media.mit.edu/~wad/color/palette.html
     const palette = [
-      { color: "#060608" },
-      { color: "#141013" },
-      { color: "#3b1725" },
-      { color: "#73172d" },
-      { color: "#b4202a" },
-      { color: "#df3e23" },
-      { color: "#fa6a0a" },
-      { color: "#f9a31b" },
-      { color: "#ffd541" },
-      { color: "#fffc40" },
-      { color: "#d6f264" },
-      { color: "#9cdb43" },
-      { color: "#59c135" },
-      { color: "#14a02e" },
-      { color: "#1a7a3e" },
-      { color: "#24523b" },
-      { color: "#122020" },
-      { color: "#143464" },
-      { color: "#285cc4" },
-      { color: "#249fde" },
-      { color: "#20d6c7" },
-      { color: "#a6fcdb" },
-      { color: "#ffffff" },
-      { color: "#fef3c0" },
-      { color: "#fad6b8" },
-      { color: "#f5a097" },
-      { color: "#e86a73" },
-      { color: "#bc4a9b" },
-      { color: "#793a80" },
-      { color: "#403353" },
-      { color: "#242234" },
-      { color: "#221c1a" },
-      { color: "#322b28" },
-      { color: "#71413b" },
-      { color: "#bb7547" },
-      { color: "#dba463" },
-      { color: "#f4d29c" },
-      { color: "#dae0ea" },
-      { color: "#b3b9d1" },
-      { color: "#8b93af" },
-      { color: "#6d758d" },
-      { color: "#4a5462" },
-      { color: "#333941" },
-      { color: "#422433" },
-      { color: "#5b3138" },
-      { color: "#8e5252" },
-      { color: "#ba756a" },
-      { color: "#e9b5a3" },
-      { color: "#e3e6ff" },
-      { color: "#b9bffb" },
-      { color: "#849be4" },
-      { color: "#588dbe" },
-      { color: "#477d85" },
-      { color: "#23674e" },
-      { color: "#328464" },
-      { color: "#5daf8d" },
-      { color: "#92dcba" },
-      { color: "#cdf7e2" },
-      { color: "#e4d2aa" },
-      { color: "#c7b08b" },
-      { color: "#a08662" },
-      { color: "#796755" },
-      { color: "#5a4e44" },
-      { color: "#423934" },
+      { color: "#000000", name: "Black" },
+      { color: "#575757", name: "Dark Gray" },
+      { color: "#ad2323", name: "Red" },
+      { color: "#2a4bd7", name: "Blue" },
+      { color: "#1d6914", name: "Green" },
+      { color: "#814a19", name: "Brown" },
+      { color: "#8126c0", name: "Purple" },
+      { color: "#a0a0a0", name: "Light Gray" },
+      { color: "#81c57a", name: "Light Green" },
+      { color: "#9dafff", name: "Light Blue" },
+      { color: "#29d0d0", name: "Cyan" },
+      { color: "#ff9233", name: "Orange" },
+      { color: "#ffee33", name: "Yellow" },
+      { color: "#e9debb", name: "Tan" },
+      { color: "#ffcdf3", name: "Pink" },
+      { color: "#ffffff", name: "White" },
     ];
 
     const countElement = document.getElementById('count');
@@ -516,7 +468,7 @@
         canvas(canvas) {
           for (let i = 0; i < canvas.length; i++) {
             const hex = canvas.charAt(i);
-            const c = hex.charCodeAt(0) - 32;
+            const c = parseInt(hex, 16);
 
             let x = i % 100;
             let y = Math.floor(i / 100);
@@ -810,10 +762,11 @@
     }
 
     function addColorButtons() {
-      for (let i = 0; i < 64; i++) {
+      for (let i = 0; i < 16; i++) {
         const colorBox = document.createElement('span');
         colorBox.className = 'colorBox';
         colorBox.style.backgroundColor = palette[i].color;
+        colorBox.title = palette[i].name;
         colorBox.onclick = () => {
           chooseColor(i);
         };
@@ -829,8 +782,8 @@
     }
 
     function chooseColor(color) {
-      if (color < 0) color = 63;
-      if (color > 63) color = 0;
+      if (color < 0) color = 15;
+      if (color > 15) color = 0;
 
       if (selectedColorBox) { selectedColorBox.classList.remove('selected'); }
       const colorBox = colorBoxes[color];
