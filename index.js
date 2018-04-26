@@ -239,7 +239,7 @@ class Grid {
       this.dirty = false;
       for (let i = 0; i < this.canvas.length; i++) {
         const hex = this.canvas.charAt(i);
-        const c = parseInt(hex, 16);
+        const c = hex.charCodeAt(0) - 32;
         let x = i % 100;
         let y = Math.floor(i / 100);
         this.grid[y][x] = c;
@@ -262,7 +262,7 @@ class Grid {
   updatePixel(x, y, c) {
     this.grid[y][x] = c;
     const i = y * 100 + x;
-    this.canvas = replaceAt(this.canvas, i, c.toString(16));
+    this.canvas = replaceAt(this.canvas, i, String.fromCharCode(c + 32));
     this.dirty = true;
   }
 
@@ -513,7 +513,7 @@ server.commands = {
       typeof (c) !== 'number' ||
       x < 0 || x > 99 ||
       y < 0 || y > 99 ||
-      c < 0 || c > 15
+      c < 0 || c > 63
     ) {
       return;
     }
