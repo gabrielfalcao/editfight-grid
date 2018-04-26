@@ -533,7 +533,7 @@ server.commands = {
 
     sendMessage({ text, id: ws.id, hash: ws.hash, ...ws.flags });
 
-    const command = text.match(/^(?:\[\w+\]\s+)?\/(.+)/);
+    const command = text.match(/^(?:\[[^\]]+\]\s+)?\/(.+)/);
     if (command) {
       const [cmd, ...args] = command[1].split(/\s/);
       const fn = userCommands[cmd.toLowerCase()];
