@@ -662,11 +662,12 @@
       });
     }
 
+    const normalize = isMobile ? Math.round : Math.floor;
     function coordinatesFor(event) {
       const rect = canvas.getBoundingClientRect();
 
-      let x = Math.floor((event.clientX - rect.left) / (canvas.clientWidth / 100));
-      let y = Math.floor((event.clientY - rect.top) / (canvas.clientHeight / 100));
+      let x = normalize((event.clientX - rect.left) / (canvas.clientWidth / 100));
+      let y = normalize((event.clientY - rect.top) / (canvas.clientHeight / 100));
 
       if (zoom) {
         x = Math.floor(x / 5) + zoom.x;
