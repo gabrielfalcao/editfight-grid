@@ -283,9 +283,15 @@ class TimeLapse {
 
   constructor(filename) {
     this.filename = filename;
-    this.file = fs.createWriteStream(filename, { flags: 'a' });
+    this.openForAppending();
     this.q = [];
     this.ready = true;
+  }
+
+  openForAppending() {
+    this.file = fs.createWriteStream(this.filename, { flags: 'a' });
+    this.file.on('error', (e) => { console.log(`Error in event error: ${e}`); this.openForAppending(); });
+    this.file.on('finish', (e) => { console.log(`Error in event finish: ${e}`); this.openForAppending(); });
   }
 
   add(x, y, c) {
@@ -329,7 +335,7 @@ class TimeLapse {
     const gif = `./public/${gifname}`;
     exec(`./make-gif ${newFilename} ${gif} 10`);
 
-    this.file = fs.createWriteStream(this.filename, { flags: 'a' });
+    this.openForAppending();
 
     return gifname;
   }
