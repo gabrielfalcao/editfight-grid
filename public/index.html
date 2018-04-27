@@ -626,7 +626,13 @@
       [39](e) { if (!zoom) return; e.preventDefault(); zoom.x++; if (zoom.x > 80) zoom.x = 80; repaintVisibleCells(); },
       [38](e) { if (!zoom) return; e.preventDefault(); zoom.y--; if (zoom.y < 0) zoom.y = 0; repaintVisibleCells(); },
       [40](e) { if (!zoom) return; e.preventDefault(); zoom.y++; if (zoom.y > 80) zoom.y = 80; repaintVisibleCells(); },
-      [67](e) { e.preventDefault(); e.shiftKey ? previousColor() : nextColor(); },
+      [67](e) {
+        e.preventDefault();
+        e.shiftKey ? previousColor() : nextColor();
+        if (lastHoveredSpot) {
+          paintSpot(lastHoveredSpot.x, lastHoveredSpot.y, currentColor);
+        }
+      },
       [32](e) { e.preventDefault(); toggleZoom(); },
     };
 
