@@ -133,6 +133,12 @@
       background: lightcyan;
     }
 
+    .comment-id {
+      font-family: monospace, monospace;
+      font-size: 75%;
+      margin-right: 0.5em;
+    }
+
     #canvas {
       max-width: 100%;
       max-height: 100%;
@@ -693,7 +699,6 @@
     }
 
     function appendMessage(msg) {
-      if (msg.id) msg.text = `(${msg.id}) ${msg.text}`;
       const commentEl = document.createElement('li');
       commentEl.className = 'comment';
       commentEl.innerText = msg.text;
@@ -701,6 +706,14 @@
       if (msg.hash) commentEl.style.color = colorForHash(msg.hash);
       if (msg.admin) commentEl.classList.add('admin');
       if (msg.status) commentEl.classList.add('status');
+
+      if (msg.id) {
+        const idEl = document.createElement('span');
+        idEl.innerText = '#' + msg.id;
+        idEl.className = 'comment-id';
+        commentEl.insertAdjacentElement('afterbegin', idEl);
+      }
+
       commentsElement.insertAdjacentElement('afterbegin', commentEl);
     }
 
