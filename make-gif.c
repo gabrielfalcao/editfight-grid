@@ -95,7 +95,8 @@ int main(int argc, char **argv) {
     0
   );
 
-  uint8_t *canvas = calloc(1000 * 1000, sizeof(uint8_t));
+  uint8_t *canvas = malloc(1000 * 1000 * sizeof(uint8_t));
+  memset(canvas, 25, 1000 * 1000);
 
   for (int y = 0; y < logo_h; y++) {
     for (int x = 0; x < logo_w; x++) {
