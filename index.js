@@ -79,6 +79,7 @@ class Server {
 
     ws.ip = ip;
     ws.isAlive = true;
+    ws.flags = {};
 
     this.ips[ws.ip] = (this.ips[ws.ip] || 0) + 1;
     this.ipCount = Object.keys(this.ips).length;
@@ -157,12 +158,12 @@ class Server {
     })
   }
 
-  ipForId(id) {
+  wsForId(id) {
     let found = null;
     this.wss.clients.forEach(ws => {
       if (ws.id === id) found = ws;
     });
-    return found && found.ip;
+    return found;
   }
 
   get count() {
@@ -483,9 +484,20 @@ const userCommands = {
     id = parseInt(id);
     if (isNaN(id)) return;
 
-    const ip = server.ipForId(id);
+    const foundWs = server.wsForId(id);
+    const ip = foundWs.ip;
     if (!ip) return;
+    if (foundWs.flags.admin) {
+      sendMessage({ text: "You can't kick [op].", status: true });
+      return;
+    }
     if (banned(ip)) return;
+
+    if (ws.flags.admin) {
+      sendMessage({ text: "You were kicked by [op] who counts as like 50 votes.", status: true });
+      ban(ip);
+      return;
+    }
 
     if (!kickVotes[ip]) kickVotes[ip] = {};
 
@@ -506,7 +518,7 @@ const userCommands = {
 server.commands = {
 
   [config.cheatcode]: function(ws) {
-    ws.flags = { admin: true };
+    ws.flags.admin = true;
   },
 
   paint(ws, update) {
