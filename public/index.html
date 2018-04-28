@@ -463,6 +463,7 @@
 
     canvas.onmousemove = mouseMovedOverCanvas;
     canvas.onclick = clickedCanvas;
+    canvas.oncontextmenu = rightClickedCanvas;
     canvas.onmouseleave = mouseLeftCanvas;
     commentForm.onsubmit = sendMessage;
     document.onvisibilitychange = repaintVisibleCells;
@@ -674,6 +675,13 @@
       }, 2000);
     }
 
+    function rightClickedCanvas(event) {
+      event.preventDefault();
+      let { x, y } = coordinatesFor(event);
+      chooseColor(grid[y][x]);
+      repaintVisibleCells();
+    }
+
     function clickedCanvas(event) {
       let { x, y } = coordinatesFor(event);
 
@@ -681,6 +689,12 @@
         const normalizedCoordinates = getZoomCoordinates(x, y);
         zoom = normalizedCoordinates;
         zooming = false;
+        repaintVisibleCells();
+        return;
+      }
+
+      if (event.which == 2) {
+        chooseColor(grid[y][x]);
         repaintVisibleCells();
         return;
       }
