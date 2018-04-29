@@ -829,3 +829,4 @@ var lzw = (function() {
 }).call(this);
 
 var compress = s => JSON.stringify(lzw.pack(s));
+compress = s => s;
