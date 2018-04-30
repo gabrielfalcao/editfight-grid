@@ -937,7 +937,12 @@
       }
 
       connection.onmessage = (message) => {
-        const json = JSON.parse(decompress(message.data));
+        let json = JSON.parse(message.data);
+
+        if (Array.isArray(json)) {
+          json = JSON.parse(lzw.unpack(json));
+        }
+
         Object.entries(json).forEach(([key, value]) => {
           handler[key](value);
         });

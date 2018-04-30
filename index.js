@@ -144,16 +144,17 @@ class Server {
   }
 
   sendTo(clients, msg) {
-    const data = (typeof msg === 'string')
-      ? msg
-      : JSON.stringify(msg);
+    let data = JSON.stringify(msg);
 
-    const payload = compress(data);
-    console.log(`Payload was ${data.length}, is ${payload.length}, saved ${data.length - payload.length} bytes.`);
+    if (data.length > 10000) {
+      const newData = JSON.stringify(lzw.pack(data));
+      console.log(`Payload was ${data.length}, is ${newData.length}, saved ${data.length - newData.length} bytes.`);
+      data = newData;
+    }
 
     clients.forEach((ws) => {
       if (ws.readyState === WebSocket.OPEN) {
-        ws.send(payload);
+        ws.send(data);
       }
     })
   }
@@ -382,10 +383,10 @@ chat.loadIfExists();
 
 server.onopen = (ws) => {
   ws.hash = parseInt(md5(ws.ip), 16);
-  server.send(ws, JSON.stringify({
+  server.send(ws, {
     messages: chat.messages,
     canvas: grid.canvas,
-  }));
+  });
   server.sendToAll({ count: server.count });
 };
 
@@ -827,6 +828,3 @@ var lzw = (function() {
 
   return lzwCompress;
 }).call(this);
-
-var compress = s => JSON.stringify(lzw.pack(s));
-compress = s => s;
